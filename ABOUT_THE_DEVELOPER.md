@@ -5,16 +5,16 @@ Complete this file during Sprint 0.
 ## Student Information
 
 **Full Name:**  
-`Enter your full name`
+`David Jeremy N. Contreras`
 
 **Student Number:**  
-`Enter your student number`
+`c23-1243-422`
 
 **Section:**  
-`Enter your section`
+`J4A`
 
 **GitHub Username:**  
-`Enter your GitHub username`
+`jaisemori`
 
 **Primary Technology Stack:**  
 JavaScript with Express.js
@@ -23,18 +23,22 @@ JavaScript with Express.js
 
 Briefly describe your current programming experience.
 
-`Write your answer here.`
+`I have practical experience building complete web applications using PHP, MySQL, JavaScript, and Tailwind CSS.
+
+On the backend, I write clean server logic and use prepared statements to keep database queries secure from SQL injection. On the frontend, I design responsive layouts, implement dark mode, and integrate JavaScript tools like rich-text editors into HTML forms.
+
+Overall, I know how to take an application from a basic database setup to a safe, functional, and user-friendly site.`
 
 ## Learning Goal
 
 What do you want to learn or improve during this course?
 
-`Write your answer here.`
+`I want to learn everything in Javascript to improve my knowledge about coding and where this programming language will lead me.`
 
 ## Development Environment
 
 **Operating System:**  
-`Enter your operating system`
+`Windows`
 
 **Node.js Version:**  
 `Enter the output of node --version`
