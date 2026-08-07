@@ -41,16 +41,16 @@ What do you want to learn or improve during this course?
 `Windows`
 
 **Node.js Version:**  
-`Enter the output of node --version`
+`v24.11.1`
 
 **npm Version:**  
-`Enter the output of npm --version`
+`11.6.2`
 
 **VS Code Installed:**  
-`Yes or No`
+`Yes`
 
 ## Academic Integrity Confirmation
 
-- [ ] I completed this profile using my own information.
-- [ ] I understand that I must be able to explain all work I submit.
-- [ ] I will disclose outside and AI assistance when required.
+- [x] I completed this profile using my own information.
+- [x] I understand that I must be able to explain all work I submit.
+- [x] I will disclose outside and AI assistance when required.
