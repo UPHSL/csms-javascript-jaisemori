@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
-import { Resident, ResidentStatus } from '../src/models/Resident.js';
+import { Resident } from '../src/models/Resident.js';
 import { ResidentRepository } from '../src/repositories/ResidentRepository.js';
 
 const getTestFilePath = (testName) => path.join(process.cwd(), 'data', `test_${testName}.json`);
@@ -52,6 +52,7 @@ describe('T03 - Resident Persistence Tests', () => {
     });
 
     const saved = repo.save(resident);
+    assert.ok(saved);
     assert.ok(saved.id);
     assert.notStrictEqual(saved.id, null);
     cleanup(filePath);
@@ -93,18 +94,19 @@ describe('T03 - Resident Persistence Tests', () => {
       address: 'Chicken Feet St',
       contactNumber: '09932133123',
       email: 'juno@example.com',
-      status: ResidentStatus.ACTIVE
+      status: 'Active'
     });
 
     repo.save(original);
     const retrieved = repo.findById('200');
 
+    assert.ok(retrieved);
     assert.strictEqual(retrieved.firstName, 'Juno');
     assert.strictEqual(retrieved.lastName, 'Molly');
     assert.strictEqual(retrieved.address, 'Chicken Feet St');
     assert.strictEqual(retrieved.contactNumber, '09932133123');
     assert.strictEqual(retrieved.email, 'juno@example.com');
-    assert.strictEqual(retrieved.status, ResidentStatus.ACTIVE);
+    assert.strictEqual(retrieved.status, 'Active');
     cleanup(filePath);
   });
 
@@ -125,7 +127,8 @@ describe('T03 - Resident Persistence Tests', () => {
 
     repo.save(resident);
     const retrieved = repo.findById('300');
-    assert.strictEqual(retrieved.status, ResidentStatus.ACTIVE);
+    assert.ok(retrieved);
+    assert.strictEqual(retrieved.status, 'Active');
     cleanup(filePath);
   });
 
@@ -177,7 +180,7 @@ describe('T03 - Resident Persistence Tests', () => {
       address: 'Chicken Feet St',
       contactNumber: '09932133123',
       email: 'juno@example.com',
-      status: ResidentStatus.ACTIVE
+      status: 'Active'
     });
     repo.save(initialResident);
 
@@ -188,11 +191,12 @@ describe('T03 - Resident Persistence Tests', () => {
       address: 'New Chicken Feet St',
       contactNumber: '09932133123',
       email: 'juno@example.com',
-      status: ResidentStatus.ACTIVE
+      status: 'Active'
     });
     repo.save(updatedResident);
 
     const retrieved = repo.findById('700');
+    assert.ok(retrieved, 'Retrieved resident should not be null');
     assert.strictEqual(retrieved.address, 'New Chicken Feet St');
     cleanup(filePath);
   });
