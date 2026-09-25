@@ -9,7 +9,8 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "test": "node --test",
-    "test:watch": "node --test --watch"
+    "test:watch": "node --test --watch",
+    "prepare": "husky"
   },
   "engines": {
     "node": ">=24 <25",
@@ -29,6 +30,9 @@
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "husky": "^9.1.7",
     "supertest": "^7.2.2"
   }
 }
