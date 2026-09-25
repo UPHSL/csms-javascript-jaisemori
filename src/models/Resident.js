@@ -1,5 +1,10 @@
+export const ResidentStatus = {
+  ACTIVE: 'Active',
+  INACTIVE: 'Inactive'
+};
+
 export class Resident {
-  constructor({ id = null, firstName = '', lastName = '', address = '', contactNumber = '', email = '', status = 'Active' } = {}) {
+  constructor({ id = null, firstName = '', lastName = '', address = '', contactNumber = '', email = '', status = ResidentStatus.ACTIVE } = {}) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
