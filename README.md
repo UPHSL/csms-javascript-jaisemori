@@ -1,56 +1,61 @@
 # Community Services Management System
 
-JavaScript and Express.js implementation of the Community Services Management
-System for the UPHSL Programming Languages Laboratory.
+A Node.js and Express.js web application for managing community residents and
+service requests.
 
-## Current Scope
+## System Capabilities
 
-The starter repository contains:
-
-- Express 5 application
-- EJS starter interface
-- `/health` JSON endpoint
-- HTTP 404 response
-- Node.js built-in test runner
-- Supertest HTTP smoke tests
-- instructional application architecture
-- Git workflow documentation
-- pull request template
-
-The starter does not yet contain resident management, persistence,
-authentication, service-request processing, or other future features.
+- Resident domain model with validation rules
+- Resident persistence (create and retrieve by ID)
+- Resident registration with input validation
+- Health check endpoint
+- HTTP 404 handling
+- EJS-based web interface
 
 ## Technology Stack
 
 - Node.js 24 LTS
-- JavaScript using ES modules
+- JavaScript (ES modules)
 - Express 5
 - EJS
 - npm
-- Node test runner
+- Node.js built-in test runner
 - Supertest
 
-## Sprint 0 Setup
+## Project Structure
 
-### 1. Clone your assigned repository
-
-```bash
-git clone <your-assigned-repository-url>
-cd <your-assigned-repository>
+```
+src/
+  config/         Application configuration
+  controllers/    Route handler functions
+  middleware/     Express middleware (e.g. 404 handler)
+  models/         Domain models (Resident, ServiceRequest)
+  repositories/   Data persistence layer
+  routes/         Express route definitions
+  services/       Business logic layer
+  utils/          Shared utilities (validators)
+  views/          EJS templates
+test/             Automated test suites
+data/             JSON flat-file storage
+public/           Static assets
 ```
 
-### 2. Verify Node and npm
+## Setup
+
+### 1. Clone the repository
+
+```bash
+git clone <your-repository-url>
+cd <your-repository>
+```
+
+### 2. Verify Node.js version
 
 ```bash
 node --version
-npm --version
 ```
 
-The required Node major version is:
-
-```text
-24
-```
+Required major version: `24`
 
 ### 3. Install dependencies
 
@@ -58,23 +63,21 @@ The required Node major version is:
 npm ci
 ```
 
-Use `npm ci` when `package-lock.json` is already available.
-
 ### 4. Run the application
 
 ```bash
 npm start
 ```
 
-Open:
+Open in browser:
 
-```text
+```
 http://127.0.0.1:3000
 ```
 
 Health endpoint:
 
-```text
+```
 http://127.0.0.1:3000/health
 ```
 
@@ -90,29 +93,4 @@ npm run dev
 npm test
 ```
 
-Expected result:
-
-```text
-4 tests passed
-```
-
-### 7. Complete the developer profile
-
-Update:
-
-```text
-ABOUT_THE_DEVELOPER.md
-```
-
-Use the required Sprint 0 commit message:
-
-```bash
-git commit -m "docs: complete developer profile"
-```
-
-## Important Rule
-
-Do not implement future sprint requirements before their tickets are released.
-
-Official requirements are maintained in the CSMS Specifications repository and
-in Moodle.
+All test suites must pass with zero failures.
