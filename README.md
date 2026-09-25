@@ -1,56 +1,67 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=24293586&assignment_repo_type=AssignmentRepo)
 # Community Services Management System
 
-JavaScript and Express.js implementation of the Community Services Management
-System for the UPHSL Programming Languages Laboratory.
+A Node.js and Express.js web application for managing community residents and
+service requests.
 
-## Current Scope
+## System Capabilities
 
-The starter repository contains:
-
-- Express 5 application
-- EJS starter interface
-- `/health` JSON endpoint
-- HTTP 404 response
-- Node.js built-in test runner
-- Supertest HTTP smoke tests
-- instructional application architecture
-- Git workflow documentation
-- pull request template
-
-The starter does not yet contain resident management, persistence,
-authentication, service-request processing, or other future features.
+- Resident domain model with status support (Active / Inactive)
+- Resident input validation (required fields, contact number format, email format)
+- Resident persistence — create and retrieve by ID
+- Resident registration with validation gate
+- Resident listing and name-based search
+- Health check endpoint (`/health`)
+- HTTP 404 handling
+- EJS-based web interface
 
 ## Technology Stack
 
 - Node.js 24 LTS
-- JavaScript using ES modules
+- JavaScript (ES modules)
 - Express 5
 - EJS
 - npm
-- Node test runner
+- Node.js built-in test runner
 - Supertest
 
-## Sprint 0 Setup
+## Project Structure
 
-### 1. Clone your assigned repository
-
-```bash
-git clone <your-assigned-repository-url>
-cd <your-assigned-repository>
+```
+src/
+  config/         Application configuration
+  controllers/    Route handler functions
+  middleware/     Express middleware (404 handler)
+  models/         Domain models (Resident, ServiceRequest)
+  repositories/   Data persistence layer (JSON flat-file)
+  routes/         Express route definitions
+  services/       Business logic layer
+  utils/          Shared utilities (validators)
+  views/          EJS templates
+test/             Automated test suites
+data/             JSON flat-file storage
+public/           Static assets
+.github/
+  workflows/      GitHub Actions CI/CD pipeline
 ```
 
-### 2. Verify Node and npm
+## Prerequisites
+
+- Node.js 24 LTS
+- npm 11+
+
+## Setup
+
+### 1. Clone the repository
+
+```bash
+git clone <your-repository-url>
+cd <your-repository>
+```
+
+### 2. Verify Node.js version
 
 ```bash
 node --version
-npm --version
-```
-
-The required Node major version is:
-
-```text
-24
 ```
 
 ### 3. Install dependencies
@@ -59,25 +70,15 @@ The required Node major version is:
 npm ci
 ```
 
-Use `npm ci` when `package-lock.json` is already available.
-
 ### 4. Run the application
 
 ```bash
 npm start
 ```
 
-Open:
+Open in browser: `http://127.0.0.1:3000`
 
-```text
-http://127.0.0.1:3000
-```
-
-Health endpoint:
-
-```text
-http://127.0.0.1:3000/health
-```
+Health endpoint: `http://127.0.0.1:3000/health`
 
 ### 5. Run in development watch mode
 
@@ -91,29 +92,10 @@ npm run dev
 npm test
 ```
 
-Expected result:
+All test suites must pass with zero failures.
 
-```text
-4 tests passed
-```
+## CI/CD
 
-### 7. Complete the developer profile
-
-Update:
-
-```text
-ABOUT_THE_DEVELOPER.md
-```
-
-Use the required Sprint 0 commit message:
-
-```bash
-git commit -m "docs: complete developer profile"
-```
-
-## Important Rule
-
-Do not implement future sprint requirements before their tickets are released.
-
-Official requirements are maintained in the CSMS Specifications repository and
-in Moodle.
+GitHub Actions automatically runs commit linting, security audits, and the full
+test suite on every push and pull request. A production artifact is packaged and
+uploaded on every successful merge to `main`.
