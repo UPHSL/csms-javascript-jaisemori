@@ -64,6 +64,8 @@ cd <your-repository>
 node --version
 ```
 
+Required major version: `24`
+
 ### 3. Install dependencies
 
 ```bash
