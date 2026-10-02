@@ -102,4 +102,13 @@ export class ResidentRepository {
     );
     return this._sort(matched).map(r => this._toResident(r));
   }
+
+  deactivate(id) {
+    const data = this._readData();
+    const index = data.findIndex(item => String(item.id) === String(id));
+    if (index < 0) return null;
+    data[index] = { ...data[index], status: 'Inactive' };
+    this._writeData(data);
+    return this._toResident(data[index]);
+  }
 }
