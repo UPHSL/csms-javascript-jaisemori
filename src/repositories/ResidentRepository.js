@@ -102,4 +102,27 @@ export class ResidentRepository {
     );
     return this._sort(matched).map(r => this._toResident(r));
   }
+
+  update(id, updatedData) {
+    const data = this._readData();
+    const index = data.findIndex(item => String(item.id) === String(id));
+    if (index < 0) return null;
+
+    const existing = data[index];
+    const updated = {
+      id: existing.id,
+      firstName: updatedData.firstName ?? existing.firstName,
+      lastName: updatedData.lastName ?? existing.lastName,
+      address: updatedData.address ?? existing.address,
+      contactNumber: updatedData.contactNumber !== undefined
+        ? String(updatedData.contactNumber)
+        : existing.contactNumber,
+      email: updatedData.email ?? existing.email,
+      status: existing.status
+    };
+
+    data[index] = updated;
+    this._writeData(data);
+    return this._toResident(updated);
+  }
 }
