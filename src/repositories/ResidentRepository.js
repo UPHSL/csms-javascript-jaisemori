@@ -78,9 +78,28 @@ export class ResidentRepository {
     if (id === null || id === undefined) return null;
     const data = this._readData();
     const record = data.find(item => String(item.id) === String(id));
-    if (!record) {
-      return null;
-    }
+    if (!record) return null;
     return this._toResident(record);
+  }
+
+  _sort(records) {
+    return [...records].sort((a, b) =>
+      a.lastName.localeCompare(b.lastName) ||
+      a.firstName.localeCompare(b.firstName) ||
+      String(a.id).localeCompare(String(b.id))
+    );
+  }
+
+  findAll() {
+    return this._sort(this._readData()).map(r => this._toResident(r));
+  }
+
+  searchByName(searchTerm) {
+    const term = searchTerm.toLowerCase();
+    const matched = this._readData().filter(r =>
+      r.firstName.toLowerCase().includes(term) ||
+      r.lastName.toLowerCase().includes(term)
+    );
+    return this._sort(matched).map(r => this._toResident(r));
   }
 }
