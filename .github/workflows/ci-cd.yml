@@ -65,7 +65,7 @@ jobs:
     needs: code-quality
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [24.x]
 
     steps:
       - name: Checkout Source Code
