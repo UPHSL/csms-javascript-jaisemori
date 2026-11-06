@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { Resident, ResidentStatus } from '../src/models/resident.js';
+import { Resident, ResidentStatus } from '../src/models/Resident.js';
 
 describe('Resident Domain Model (T01)', () => {
   // Test 1: Resident Creation
