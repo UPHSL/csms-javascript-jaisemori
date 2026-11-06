@@ -2,13 +2,15 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 import { Resident } from '../src/models/Resident.js';
 import { ResidentRepository } from '../src/repositories/ResidentRepository.js';
 import { ServiceRequest, ServiceRequestStatus } from '../src/models/ServiceRequest.js';
 import { ServiceRequestRepository } from '../src/repositories/ServiceRequestRepository.js';
 import { ServiceRequestSubmissionService } from '../src/services/ServiceRequestSubmissionService.js';
 
-const getFilePath = (name) => path.join(process.cwd(), 'data', `test_t09_${name}.json`);
+const getResidentFilePath = (name) => path.join(process.cwd(), 'data', `test_t09_${name}.json`);
+const getRequestDatabasePath = (name) => path.join(process.cwd(), 'data', `test_t09_${name}.sqlite`);
 const cleanup = (...filePaths) => {
   for (const filePath of filePaths) {
     try { fs.unlinkSync(filePath); } catch {}
@@ -41,8 +43,8 @@ const buildService = (residentFile, serviceRequestFile) => {
 
 describe('T09 - Service Request Submission Tests', () => {
   it('Test 1: should submit a valid Service Request for an active Resident successfully', () => {
-    const residentFile = getFilePath('resident_t1');
-    const requestFile = getFilePath('request_t1');
+    const residentFile = getResidentFilePath('resident_t1');
+    const requestFile = getRequestDatabasePath('request_t1');
     cleanup(residentFile, requestFile);
     const { residentRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
@@ -55,25 +57,39 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Test 2: should assign a persistence-generated ID after successful submission', () => {
-    const residentFile = getFilePath('resident_t2');
-    const requestFile = getFilePath('request_t2');
+    const residentFile = getResidentFilePath('resident_t2');
+    const requestFile = getRequestDatabasePath('request_t2');
     cleanup(residentFile, requestFile);
     const { residentRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
 
-    const request = new ServiceRequest(validRequestData);
-    assert.equal(request.id, null);
-    const result = submissionService.submit(request);
+    const firstRequest = new ServiceRequest(validRequestData);
+    assert.equal(firstRequest.id, null);
+    const firstResult = submissionService.submit(firstRequest);
+    const secondResult = submissionService.submit(new ServiceRequest({
+      ...validRequestData,
+      description: 'Second independently persisted request.'
+    }));
 
-    assert.ok(result.serviceRequest.id);
-    assert.notEqual(result.serviceRequest.id, null);
-    assert.notEqual(result.serviceRequest.id, result.serviceRequest.residentId);
+    const database = new DatabaseSync(requestFile, { readOnly: true });
+    let sequence;
+    try {
+      sequence = database.prepare(
+        "SELECT seq FROM sqlite_sequence WHERE name = 'service_requests'"
+      ).get();
+    } finally {
+      database.close();
+    }
+
+    assert.equal(typeof firstResult.serviceRequest.id, 'number');
+    assert.equal(secondResult.serviceRequest.id, firstResult.serviceRequest.id + 1);
+    assert.equal(Number(sequence.seq), secondResult.serviceRequest.id);
     cleanup(residentFile, requestFile);
   });
 
   it('Test 3: should persist and retrieve a submitted Service Request by ID', () => {
-    const residentFile = getFilePath('resident_t3');
-    const requestFile = getFilePath('request_t3');
+    const residentFile = getResidentFilePath('resident_t3');
+    const requestFile = getRequestDatabasePath('request_t3');
     cleanup(residentFile, requestFile);
     const { residentRepository, serviceRequestRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
@@ -87,8 +103,8 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Test 4: should preserve submitted Service Request information after persistence', () => {
-    const residentFile = getFilePath('resident_t4');
-    const requestFile = getFilePath('request_t4');
+    const residentFile = getResidentFilePath('resident_t4');
+    const requestFile = getRequestDatabasePath('request_t4');
     cleanup(residentFile, requestFile);
     const { residentRepository, serviceRequestRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
@@ -104,9 +120,41 @@ describe('T09 - Service Request Submission Tests', () => {
     cleanup(residentFile, requestFile);
   });
 
+  it('should preserve the exact Resident ID format in SQLite persistence', () => {
+    const residentFile = getResidentFilePath('resident_id_format');
+    const requestFile = getRequestDatabasePath('request_id_format');
+    cleanup(residentFile, requestFile);
+    const { residentRepository, serviceRequestRepository, submissionService } = buildService(residentFile, requestFile);
+    residentRepository.save(new Resident({ ...activeResidentData, id: '001' }));
+
+    const result = submissionService.submit(new ServiceRequest({ ...validRequestData, residentId: '001' }));
+    const retrieved = serviceRequestRepository.findById(result.serviceRequest.id);
+
+    assert.equal(result.success, true);
+    assert.equal(retrieved.residentId, '001');
+    cleanup(residentFile, requestFile);
+  });
+
+  it('should safely round-trip quoted and SQL-like request text', () => {
+    const residentFile = getResidentFilePath('resident_parameterized');
+    const requestFile = getRequestDatabasePath('request_parameterized');
+    cleanup(residentFile, requestFile);
+    const { residentRepository, serviceRequestRepository, submissionService } = buildService(residentFile, requestFile);
+    residentRepository.save(new Resident(activeResidentData));
+    const description = "Resident's request; DROP TABLE service_requests;";
+
+    const result = submissionService.submit(new ServiceRequest({ ...validRequestData, description }));
+    const retrieved = serviceRequestRepository.findById(result.serviceRequest.id);
+
+    assert.equal(result.success, true);
+    assert.equal(retrieved.description, description);
+    assert.equal(serviceRequestRepository.findAll().length, 1);
+    cleanup(residentFile, requestFile);
+  });
+
   it('Test 5: should keep a submitted Service Request status as Pending', () => {
-    const residentFile = getFilePath('resident_t5');
-    const requestFile = getFilePath('request_t5');
+    const residentFile = getResidentFilePath('resident_t5');
+    const requestFile = getRequestDatabasePath('request_t5');
     cleanup(residentFile, requestFile);
     const { residentRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
@@ -118,8 +166,8 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Test 6: should reject blank serviceType with an identifiable validation error', () => {
-    const residentFile = getFilePath('resident_t6');
-    const requestFile = getFilePath('request_t6');
+    const residentFile = getResidentFilePath('resident_t6');
+    const requestFile = getRequestDatabasePath('request_t6');
     cleanup(residentFile, requestFile);
     const { residentRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
@@ -133,8 +181,8 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Test 7: should reject blank description with an identifiable validation error', () => {
-    const residentFile = getFilePath('resident_t7');
-    const requestFile = getFilePath('request_t7');
+    const residentFile = getResidentFilePath('resident_t7');
+    const requestFile = getRequestDatabasePath('request_t7');
     cleanup(residentFile, requestFile);
     const { residentRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
@@ -148,8 +196,8 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Test 8: should not persist an invalid Service Request', () => {
-    const residentFile = getFilePath('resident_t8');
-    const requestFile = getFilePath('request_t8');
+    const residentFile = getResidentFilePath('resident_t8');
+    const requestFile = getRequestDatabasePath('request_t8');
     cleanup(residentFile, requestFile);
     const { residentRepository, serviceRequestRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
@@ -161,8 +209,8 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Test 9: should reject a structurally valid but nonexistent residentId without persistence', () => {
-    const residentFile = getFilePath('resident_t9');
-    const requestFile = getFilePath('request_t9');
+    const residentFile = getResidentFilePath('resident_t9');
+    const requestFile = getRequestDatabasePath('request_t9');
     cleanup(residentFile, requestFile);
     const { serviceRequestRepository, submissionService } = buildService(residentFile, requestFile);
 
@@ -175,8 +223,8 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Test 10: should reject an Inactive Resident without modifying the Resident or persisting the request', () => {
-    const residentFile = getFilePath('resident_t10');
-    const requestFile = getFilePath('request_t10');
+    const residentFile = getResidentFilePath('resident_t10');
+    const requestFile = getRequestDatabasePath('request_t10');
     cleanup(residentFile, requestFile);
     const { residentRepository, serviceRequestRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident({ ...activeResidentData, status: 'Inactive' }));
@@ -192,8 +240,8 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Test 11: should reject a new Service Request with a non-Pending status', () => {
-    const residentFile = getFilePath('resident_t11');
-    const requestFile = getFilePath('request_t11');
+    const residentFile = getResidentFilePath('resident_t11');
+    const requestFile = getRequestDatabasePath('request_t11');
     cleanup(residentFile, requestFile);
     const { residentRepository, serviceRequestRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
@@ -208,8 +256,8 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Test 12: should persist across separate Service Request repository instances', () => {
-    const residentFile = getFilePath('resident_t12');
-    const requestFile = getFilePath('request_t12');
+    const residentFile = getResidentFilePath('resident_t12');
+    const requestFile = getRequestDatabasePath('request_t12');
     cleanup(residentFile, requestFile);
     const { residentRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
@@ -224,8 +272,8 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Test 13: should not modify the Resident after successful Service Request submission', () => {
-    const residentFile = getFilePath('resident_t13');
-    const requestFile = getFilePath('request_t13');
+    const residentFile = getResidentFilePath('resident_t13');
+    const requestFile = getRequestDatabasePath('request_t13');
     cleanup(residentFile, requestFile);
     const { residentRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));
@@ -244,8 +292,8 @@ describe('T09 - Service Request Submission Tests', () => {
   });
 
   it('Date Validation Test: should reject an invalid request date without persistence', () => {
-    const residentFile = getFilePath('resident_date');
-    const requestFile = getFilePath('request_date');
+    const residentFile = getResidentFilePath('resident_date');
+    const requestFile = getRequestDatabasePath('request_date');
     cleanup(residentFile, requestFile);
     const { residentRepository, serviceRequestRepository, submissionService } = buildService(residentFile, requestFile);
     residentRepository.save(new Resident(activeResidentData));

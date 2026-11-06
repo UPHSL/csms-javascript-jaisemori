@@ -1,72 +1,105 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { ServiceRequest, ServiceRequestStatus } from '../models/ServiceRequest.js';
+import { DatabaseSync } from 'node:sqlite';
+import { ServiceRequest } from '../models/ServiceRequest.js';
 
 export class ServiceRequestRepository {
-  constructor(filePath) {
-    this.filePath = filePath || path.join(process.cwd(), 'data', 'service_requests.json');
-    this._ensureFileExists();
+  constructor(databasePath) {
+    this.databasePath = databasePath || path.join(process.cwd(), 'data', 'service_requests.sqlite');
+    this._initializeDatabase();
   }
 
-  _ensureFileExists() {
-    const dir = path.dirname(this.filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    if (!fs.existsSync(this.filePath)) {
-      fs.writeFileSync(this.filePath, JSON.stringify([]), 'utf8');
-    }
+  _openDatabase(options = {}) {
+    return new DatabaseSync(this.databasePath, options);
   }
 
-  _readData() {
+  _initializeDatabase() {
+    const directory = path.dirname(this.databasePath);
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
+    }
+
+    const database = this._openDatabase();
     try {
-      const content = fs.readFileSync(this.filePath, 'utf8');
-      return JSON.parse(content || '[]');
-    } catch {
-      return [];
+      database.exec(`
+        CREATE TABLE IF NOT EXISTS service_requests (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          resident_id TEXT NOT NULL,
+          service_type TEXT NOT NULL,
+          description TEXT NOT NULL,
+          date_requested TEXT NOT NULL,
+          status TEXT NOT NULL
+        )
+      `);
+    } finally {
+      database.close();
     }
-  }
-
-  _writeData(data) {
-    fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2), 'utf8');
-  }
-
-  _generateId(data) {
-    if (!data || data.length === 0) return '1';
-    const maxId = Math.max(...data.map(item => parseInt(item.id, 10) || 0));
-    return String(maxId + 1);
   }
 
   _toServiceRequest(record) {
     if (!record) return null;
-    return new ServiceRequest(record);
+    return new ServiceRequest({
+      id: Number(record.id),
+      residentId: record.resident_id,
+      serviceType: record.service_type,
+      description: record.description,
+      dateRequested: record.date_requested,
+      status: record.status
+    });
   }
 
   save(serviceRequest) {
-    const data = this._readData();
-    const assignedId = this._generateId(data);
-    const serviceRequestRecord = {
-      id: assignedId,
-      residentId: String(serviceRequest.residentId),
-      serviceType: serviceRequest.serviceType || '',
-      description: serviceRequest.description || '',
-      dateRequested: serviceRequest.dateRequested || '',
-      status: serviceRequest.status || ServiceRequestStatus.PENDING
-    };
+    const database = this._openDatabase();
+    try {
+      const result = database.prepare(`
+        INSERT INTO service_requests (
+          resident_id,
+          service_type,
+          description,
+          date_requested,
+          status
+        ) VALUES (?, ?, ?, ?, ?)
+      `).run(
+        String(serviceRequest.residentId),
+        serviceRequest.serviceType,
+        serviceRequest.description,
+        serviceRequest.dateRequested,
+        serviceRequest.status
+      );
 
-    data.push(serviceRequestRecord);
-    this._writeData(data);
-    return this._toServiceRequest(serviceRequestRecord);
+      return this.findById(Number(result.lastInsertRowid));
+    } finally {
+      database.close();
+    }
   }
 
   findById(id) {
     if (id === null || id === undefined) return null;
-    const data = this._readData();
-    const record = data.find(item => String(item.id) === String(id));
-    return this._toServiceRequest(record);
+
+    const database = this._openDatabase({ readOnly: true });
+    try {
+      const record = database.prepare(`
+        SELECT id, resident_id, service_type, description, date_requested, status
+        FROM service_requests
+        WHERE id = ?
+      `).get(Number(id));
+      return this._toServiceRequest(record);
+    } finally {
+      database.close();
+    }
   }
 
   findAll() {
-    return this._readData().map(record => this._toServiceRequest(record));
+    const database = this._openDatabase({ readOnly: true });
+    try {
+      const records = database.prepare(`
+        SELECT id, resident_id, service_type, description, date_requested, status
+        FROM service_requests
+        ORDER BY id
+      `).all();
+      return records.map(record => this._toServiceRequest(record));
+    } finally {
+      database.close();
+    }
   }
 }
