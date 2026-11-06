@@ -1,7 +1,137 @@
-/**
- * Resident persistence placeholder.
- *
- * Persistence behavior will be introduced through a future CSMS ticket.
- */
+import fs from 'node:fs';
+import path from 'node:path';
+import { Resident } from '../models/Resident.js';
+
 export class ResidentRepository {
+  /**
+   * @param {string} [filePath]
+   */
+  constructor(filePath) {
+    this.filePath = filePath || path.join(process.cwd(), 'data', 'residents.json');
+    this._ensureFileExists();
+  }
+
+  _ensureFileExists() {
+    const dir = path.dirname(this.filePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    if (!fs.existsSync(this.filePath)) {
+      fs.writeFileSync(this.filePath, JSON.stringify([]), 'utf8');
+    }
+  }
+
+  _readData() {
+    try {
+      const content = fs.readFileSync(this.filePath, 'utf8');
+      return JSON.parse(content || '[]');
+    } catch {
+      return [];
+    }
+  }
+
+  _writeData(data) {
+    fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2), 'utf8');
+  }
+
+  _generateId(data) {
+    if (!data || data.length === 0) return '1';
+    const maxId = Math.max(...data.map(item => parseInt(item.id, 10) || 0));
+    return String(maxId + 1);
+  }
+
+  _toResident(record) {
+    if (!record) return null;
+    return new Resident(record);
+  }
+
+  save(resident) {
+    const data = this._readData();
+
+    let assignedId = resident.id;
+    if (assignedId === null || assignedId === undefined || String(assignedId).trim() === '') {
+      assignedId = this._generateId(data);
+    }
+
+    const residentRecord = {
+      id: String(assignedId),
+      firstName: resident.firstName || '',
+      lastName: resident.lastName || '',
+      address: resident.address || '',
+      contactNumber: String(resident.contactNumber ?? ''),
+      email: resident.email || '',
+      status: resident.status || 'Active'
+    };
+
+    const existingIndex = data.findIndex(item => String(item.id) === String(assignedId));
+    if (existingIndex >= 0) {
+      data[existingIndex] = residentRecord;
+    } else {
+      data.push(residentRecord);
+    }
+
+    this._writeData(data);
+    return this._toResident(residentRecord);
+  }
+
+  findById(id) {
+    if (id === null || id === undefined) return null;
+    const data = this._readData();
+    const record = data.find(item => String(item.id) === String(id));
+    if (!record) return null;
+    return this._toResident(record);
+  }
+
+  _sort(records) {
+    return [...records].sort((a, b) =>
+      a.lastName.localeCompare(b.lastName) ||
+      a.firstName.localeCompare(b.firstName) ||
+      String(a.id).localeCompare(String(b.id))
+    );
+  }
+
+  findAll() {
+    return this._sort(this._readData()).map(r => this._toResident(r));
+  }
+
+  searchByName(searchTerm) {
+    const term = searchTerm.toLowerCase();
+    const matched = this._readData().filter(r =>
+      r.firstName.toLowerCase().includes(term) ||
+      r.lastName.toLowerCase().includes(term)
+    );
+    return this._sort(matched).map(r => this._toResident(r));
+  }
+
+  update(id, updatedData) {
+    const data = this._readData();
+    const index = data.findIndex(item => String(item.id) === String(id));
+    if (index < 0) return null;
+
+    const existing = data[index];
+    const updated = {
+      id: existing.id,
+      firstName: updatedData.firstName ?? existing.firstName,
+      lastName: updatedData.lastName ?? existing.lastName,
+      address: updatedData.address ?? existing.address,
+      contactNumber: updatedData.contactNumber !== undefined
+        ? String(updatedData.contactNumber)
+        : existing.contactNumber,
+      email: updatedData.email ?? existing.email,
+      status: existing.status
+    };
+
+    data[index] = updated;
+    this._writeData(data);
+    return this._toResident(updated);
+  }
+
+  deactivate(id) {
+    const data = this._readData();
+    const index = data.findIndex(item => String(item.id) === String(id));
+    if (index < 0) return null;
+    data[index] = { ...data[index], status: 'Inactive' };
+    this._writeData(data);
+    return this._toResident(data[index]);
+  }
 }
