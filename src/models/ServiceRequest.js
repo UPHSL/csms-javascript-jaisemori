@@ -2,7 +2,10 @@
  * Service Request domain model.
  */
 export const ServiceRequestStatus = {
-  PENDING: 'Pending'
+  PENDING: 'Pending',
+  IN_PROGRESS: 'In Progress',
+  COMPLETED: 'Completed',
+  CANCELLED: 'Cancelled'
 };
 
 export class ServiceRequest {

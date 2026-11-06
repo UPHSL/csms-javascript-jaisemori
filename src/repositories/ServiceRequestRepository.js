@@ -102,4 +102,20 @@ export class ServiceRequestRepository {
       database.close();
     }
   }
+
+  updateStatus(id, status) {
+    const database = this._openDatabase();
+    try {
+      const result = database.prepare(`
+        UPDATE service_requests
+        SET status = ?
+        WHERE id = ?
+      `).run(status, Number(id));
+
+      if (Number(result.changes) === 0) return null;
+      return this.findById(id);
+    } finally {
+      database.close();
+    }
+  }
 }
