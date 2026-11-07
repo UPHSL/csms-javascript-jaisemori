@@ -90,13 +90,46 @@ export class ServiceRequestRepository {
   }
 
   findAll() {
+    return this.query();
+  }
+
+  query({ searchTerm = '', status = null } = {}) {
     const database = this._openDatabase({ readOnly: true });
     try {
+      const conditions = [];
+      const parameters = [];
+      const normalizedTerm = typeof searchTerm === 'string'
+        ? searchTerm.trim().toLowerCase()
+        : '';
+
+      if (normalizedTerm) {
+        const escapedTerm = normalizedTerm
+          .replaceAll('\\', '\\\\')
+          .replaceAll('%', '\\%')
+          .replaceAll('_', '\\_');
+        const pattern = `%${escapedTerm}%`;
+
+        conditions.push(`(
+          LOWER(service_type) LIKE ? ESCAPE '\\'
+          OR LOWER(description) LIKE ? ESCAPE '\\'
+        )`);
+        parameters.push(pattern, pattern);
+      }
+
+      if (status !== null && status !== undefined && status !== '') {
+        conditions.push('status = ?');
+        parameters.push(status);
+      }
+
+      const whereClause = conditions.length > 0
+        ? `WHERE ${conditions.join(' AND ')}`
+        : '';
       const records = database.prepare(`
         SELECT id, resident_id, service_type, description, date_requested, status
         FROM service_requests
-        ORDER BY id
-      `).all();
+        ${whereClause}
+        ORDER BY date_requested DESC, id DESC
+      `).all(...parameters);
       return records.map(record => this._toServiceRequest(record));
     } finally {
       database.close();
