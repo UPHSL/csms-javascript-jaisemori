@@ -19,11 +19,9 @@ export class ServiceRequestQueryService {
     const normalizedSearchTerm = typeof searchTerm === 'string'
       ? searchTerm.trim()
       : '';
-    const normalizedStatus = typeof status === 'string'
-      ? status.trim()
-      : status;
+    const hasStatusFilter = status !== null && status !== undefined && status !== '';
 
-    if (normalizedStatus && !supportedStatuses.has(normalizedStatus)) {
+    if (hasStatusFilter && !supportedStatuses.has(status)) {
       return {
         success: false,
         unsupportedStatus: true,
@@ -38,7 +36,7 @@ export class ServiceRequestQueryService {
       errors: [],
       serviceRequests: this.serviceRequestRepository.query({
         searchTerm: normalizedSearchTerm,
-        status: normalizedStatus || null
+        status: hasStatusFilter ? status : null
       })
     };
   }

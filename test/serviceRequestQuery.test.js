@@ -260,7 +260,7 @@ describe('T11 - Search and View Service Requests', () => {
     );
   });
 
-  it('Test 11: supports all four statuses and treats whitespace status as no filter', t => {
+  it('Test 11: supports all four statuses when no status filter includes every state', t => {
     const { repository, service } = createService(t, 'all_statuses');
     for (const status of Object.values(ServiceRequestStatus)) {
       saveRequest(repository, { status });
@@ -272,7 +272,7 @@ describe('T11 - Search and View Service Requests', () => {
         [status]
       );
     }
-    assert.equal(service.searchServiceRequests('', '   ').serviceRequests.length, 4);
+    assert.equal(service.searchServiceRequests().serviceRequests.length, 4);
   });
 
   it('Test 12: combines text matching either field with status using AND', t => {
@@ -291,6 +291,11 @@ describe('T11 - Search and View Service Requests', () => {
       serviceType: 'Barangay Clearance',
       description: 'Employment requirement.',
       status: ServiceRequestStatus.IN_PROGRESS
+    });
+    saveRequest(repository, {
+      serviceType: 'Road Repair',
+      description: 'Pothole inspection requested.',
+      status: ServiceRequestStatus.CANCELLED
     });
 
     assert.deepEqual(
@@ -313,7 +318,34 @@ describe('T11 - Search and View Service Requests', () => {
     );
   });
 
-  it('Test 14: rejects an unsupported status without querying or changing persistence', t => {
+  it('Test 14: preserves all six fields through list, search, and view', t => {
+    const { repository, service } = createService(t, 'preserve_fields');
+    const saved = saveRequest(repository, {
+      residentId: '00025',
+      serviceType: 'Medical Assistance',
+      description: 'Distinct medicine support request.',
+      dateRequested: '2026-10-03',
+      status: ServiceRequestStatus.COMPLETED
+    });
+
+    const expected = {
+      id: saved.id,
+      residentId: '00025',
+      serviceType: 'Medical Assistance',
+      description: 'Distinct medicine support request.',
+      dateRequested: '2026-10-03',
+      status: ServiceRequestStatus.COMPLETED
+    };
+    const listResult = service.listServiceRequests().find(request => request.id === saved.id);
+    const searchResult = service.searchServiceRequests('distinct').serviceRequests[0];
+    const viewResult = service.viewServiceRequest(saved.id);
+
+    for (const result of [listResult, searchResult, viewResult]) {
+      assert.deepEqual({ ...result }, expected);
+    }
+  });
+
+  it('rejects unsupported and non-exact statuses without querying or changing persistence', t => {
     const { repository, service } = createService(t, 'unsupported');
     const saved = saveRequest(repository);
     const originalQuery = repository.query.bind(repository);
@@ -323,14 +355,14 @@ describe('T11 - Search and View Service Requests', () => {
       return originalQuery(...args);
     };
 
-    const result = service.searchServiceRequests('clearance', 'Approved');
-
-    assert.deepEqual(result, {
-      success: false,
-      unsupportedStatus: true,
-      errors: ['Unsupported Service Request status filter.'],
-      serviceRequests: []
-    });
+    for (const status of ['Approved', '   ', ' Pending ']) {
+      assert.deepEqual(service.searchServiceRequests('clearance', status), {
+        success: false,
+        unsupportedStatus: true,
+        errors: ['Unsupported Service Request status filter.'],
+        serviceRequests: []
+      });
+    }
     assert.equal(queryCalls, 0);
     assert.deepEqual(repository.findById(saved.id), saved);
   });

@@ -24,7 +24,7 @@
 ## Review Focus
 
 - `null` and `undefined` search terms behave as blank listing input.
-- Whitespace-only status input behaves as no filter; non-empty mixed/lowercase unsupported statuses are rejected.
+- Status input must exactly match a supported value; whitespace-only, padded, mixed-case, and unsupported statuses are rejected.
 - Apostrophes and SQL-looking text remain safe because all values are bound.
 - `%`, `_`, and `\\` in a search term are treated literally rather than as unintended SQL wildcards.
 - Filtered and combined queries retain the same date/ID ordering as normal listing.
@@ -96,7 +96,7 @@ git commit -m "feat: add persistent service request queries"
 
 Ensure `test/serviceRequestQuery.test.js` explicitly covers all 14 numbered scenarios through the service layer: list all; empty list; ordering; existing view; unknown ID/no insertion; partial service-type search; partial description search; blank search; no match; status filter; no filter includes all statuses; combined `text AND status`; no duplicate; complete field preservation through list/search/view.
 
-Also assert `null`/`undefined` search behavior, whitespace-only status behavior, unsupported status result shape, query read-only behavior, and exact ordering after filtering.
+Also assert `null`/`undefined` search behavior, exact status behavior, unsupported status result shape, query read-only behavior, and exact ordering after filtering.
 
 - [ ] **Step 2: Run focused tests and verify RED**
 
@@ -108,7 +108,7 @@ Expected: FAIL with missing `ServiceRequestQueryService`.
 
 - `listServiceRequests()` delegates to `findAll()`.
 - `viewServiceRequest(id)` delegates to the existing `findById(id)`.
-- `searchServiceRequests(searchTerm = '', status = null)` converts absent text to `''`, trims text input, trims string status input, treats blank status as no filter, validates non-blank status against exactly the four T10 values, and delegates valid criteria to `repository.query()`.
+- `searchServiceRequests(searchTerm = '', status = null)` converts absent text to `''`, trims text input, treats only an absent or empty-string status as no filter, validates supplied status exactly against the four T10 values without trimming it, and delegates valid criteria to `repository.query()`.
 - Unsupported status returns `{ success: false, unsupportedStatus: true, errors: ['Unsupported Service Request status filter.'], serviceRequests: [] }` without querying persistence.
 - Successful queries return `{ success: true, unsupportedStatus: false, errors: [], serviceRequests }`.
 

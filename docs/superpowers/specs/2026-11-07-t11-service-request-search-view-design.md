@@ -67,7 +67,7 @@ Create `ServiceRequestQueryService` with these public operations:
   - Success: `{ success: true, unsupportedStatus: false, errors: [], serviceRequests: [...] }`.
   - Unsupported non-empty status: `{ success: false, unsupportedStatus: true, errors: ['Unsupported Service Request status filter.'], serviceRequests: [] }`.
 
-The service trims string search input. Blank, whitespace-only, `null`, and `undefined` text become an empty query term. A missing or blank status means no status filter. Non-empty status values must exactly match one of the four `ServiceRequestStatus` values before the repository is called.
+The service trims string search input. Blank, whitespace-only, `null`, and `undefined` text become an empty query term. A missing (`null`/`undefined`) or empty-string status means no status filter. Any supplied non-empty status, including whitespace-padded input, must exactly match one of the four `ServiceRequestStatus` values before the repository is called.
 
 The service coordinates use cases only; it contains no SQL and performs no row filtering.
 
