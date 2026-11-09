@@ -98,6 +98,18 @@ describe('T12 - Resident Management Interface', () => {
     assert.match(noMatch.text, /No Residents found\./);
   });
 
+  it('handles repeated search parameters without exposing an internal error', async t => {
+    const { app, repository } = createHarness(t, 'repeated_search');
+    saveResident(repository);
+
+    const response = await request(app).get('/residents?search=Maria&search=Santos');
+
+    assert.equal(response.statusCode, 200);
+    assert.match(response.text, /Resident Management/);
+    assert.match(response.text, /Maria/);
+    assert.doesNotMatch(response.text, /TypeError|\.trim is not a function|residentController\.js/i);
+  });
+
   it('Test 5: registration form renders all required fields without ID or status inputs', async t => {
     const { app } = createHarness(t, 'registration_form');
 
@@ -217,6 +229,76 @@ describe('T12 - Resident Management Interface', () => {
     const { app, repository } = createHarness(t, 'missing_resident');
 
     const response = await request(app).get('/residents/999/edit');
+
+    assert.equal(response.statusCode, 404);
+    assert.match(response.text, /Resident not found/);
+    assert.doesNotMatch(response.text, /Error:|stack|ENOENT/i);
+    assert.deepEqual(repository.findAll(), []);
+  });
+
+  it('Test 12: deactivation changes only status and keeps the Resident persisted and listable', async t => {
+    const { app, repository } = createHarness(t, 'deactivation');
+    const resident = saveResident(repository);
+
+    const response = await request(app).post(`/residents/${resident.id}/deactivate`);
+
+    assert.equal(response.statusCode, 303);
+    assert.match(response.headers.location, /Resident%20deactivated%20successfully\./);
+    const deactivated = repository.findById(resident.id);
+    assert.deepEqual(deactivated, new Resident({ ...resident, status: 'Inactive' }));
+    assert.equal(repository.findAll().length, 1);
+    const listing = await request(app).get(response.headers.location);
+    assert.match(listing.text, /Maria/);
+    assert.match(listing.text, /Inactive/);
+  });
+
+  it('Test 13: an Inactive Resident remains searchable and has no actionable Deactivate control', async t => {
+    const { app, repository } = createHarness(t, 'inactive_visibility');
+    const resident = saveResident(repository, { status: 'Inactive' });
+
+    const response = await request(app).get('/residents').query({ search: 'sAnToS' });
+
+    assert.equal(response.statusCode, 200);
+    assert.match(response.text, /Maria/);
+    assert.match(response.text, /Inactive/);
+    assert.match(response.text, /Already Inactive/);
+    assert.doesNotMatch(response.text, new RegExp(`action="/residents/${resident.id}/deactivate"`));
+  });
+
+  it('Test 14: listing, search, registration form, and edit form GET requests are read-only', async t => {
+    const { app, repository } = createHarness(t, 'get_safety');
+    const resident = saveResident(repository);
+    const before = repository.findAll();
+
+    for (const url of [
+      '/residents',
+      '/residents?search=Maria',
+      '/residents/register',
+      `/residents/${resident.id}/edit`,
+      `/residents/${resident.id}/deactivate`
+    ]) {
+      await request(app).get(url);
+      assert.deepEqual(repository.findAll(), before, `${url} modified persistence`);
+    }
+  });
+
+  it('handles repeated deactivation safely through the T07 idempotent behavior', async t => {
+    const { app, repository } = createHarness(t, 'repeated_deactivation');
+    const resident = saveResident(repository);
+
+    await request(app).post(`/residents/${resident.id}/deactivate`);
+    const response = await request(app).post(`/residents/${resident.id}/deactivate`);
+
+    assert.equal(response.statusCode, 303);
+    assert.match(response.headers.location, /Resident%20is%20already%20Inactive\./);
+    assert.equal(repository.findAll().length, 1);
+    assert.equal(repository.findById(resident.id).status, 'Inactive');
+  });
+
+  it('returns a controlled not-found page for direct deactivation of a missing Resident', async t => {
+    const { app, repository } = createHarness(t, 'missing_deactivation');
+
+    const response = await request(app).post('/residents/999/deactivate');
 
     assert.equal(response.statusCode, 404);
     assert.match(response.text, /Resident not found/);

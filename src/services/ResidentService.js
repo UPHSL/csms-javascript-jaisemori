@@ -7,6 +7,10 @@ export class ResidentService {
     return this.repository.findAll();
   }
 
+  findResidentById(id) {
+    return this.repository.findById(id);
+  }
+
   searchResidents(searchTerm) {
     const term = (searchTerm ?? '').trim();
     if (!term) return this.listResidents();

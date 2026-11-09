@@ -7,15 +7,15 @@ const pickEditableFields = body => Object.fromEntries(
 );
 
 export class ResidentController {
-  constructor({ residentService, registrationService, updateService, residentRepository }) {
+  constructor({ residentService, registrationService, updateService, deactivationService }) {
     this.residentService = residentService;
     this.registrationService = registrationService;
     this.updateService = updateService;
-    this.residentRepository = residentRepository;
+    this.deactivationService = deactivationService;
   }
 
   list = (request, response) => {
-    const searchTerm = request.query.search ?? '';
+    const searchTerm = typeof request.query.search === 'string' ? request.query.search : '';
     const residents = this.residentService.searchResidents(searchTerm);
 
     response.status(200).render('residents/index', {
@@ -49,7 +49,7 @@ export class ResidentController {
   };
 
   showEditForm = (request, response) => {
-    const resident = this.residentRepository.findById(request.params.id);
+    const resident = this.residentService.findResidentById(request.params.id);
     if (!resident) return this.renderNotFound(response);
 
     return response.status(200).render('residents/form', {
@@ -65,7 +65,7 @@ export class ResidentController {
 
     if (result.notFound) return this.renderNotFound(response);
     if (!result.success) {
-      const persisted = this.residentRepository.findById(request.params.id);
+      const persisted = this.residentService.findResidentById(request.params.id);
       return response.status(400).render('residents/form', {
         mode: 'edit',
         resident: { ...persisted, ...submitted },
@@ -74,6 +74,16 @@ export class ResidentController {
     }
 
     return response.redirect(303, '/residents?message=Resident%20information%20updated%20successfully.');
+  };
+
+  deactivate = (request, response) => {
+    const result = this.deactivationService.deactivateResident(request.params.id);
+    if (result.notFound) return this.renderNotFound(response);
+
+    const message = result.alreadyInactive
+      ? 'Resident%20is%20already%20Inactive.'
+      : 'Resident%20deactivated%20successfully.';
+    return response.redirect(303, `/residents?message=${message}`);
   };
 
   renderNotFound = response => response.status(404).render('residents/not-found');
