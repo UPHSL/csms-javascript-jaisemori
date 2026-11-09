@@ -4,7 +4,9 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 
 import { notFound } from "./middleware/notFound.js";
+import { ResidentRepository } from "./repositories/ResidentRepository.js";
 import mainRoutes from "./routes/index.js";
+import { createResidentRouter } from "./routes/residentRoutes.js";
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFile);
@@ -14,8 +16,9 @@ const currentDirectory = path.dirname(currentFile);
  *
  * @returns {import("express").Express} Configured Express application.
  */
-export function createApp() {
+export function createApp({ residentRepository } = {}) {
   const app = express();
+  const residents = residentRepository ?? new ResidentRepository();
 
   app.disable("x-powered-by");
 
@@ -27,6 +30,7 @@ export function createApp() {
   app.use(express.static(path.join(currentDirectory, "..", "public")));
 
   app.use(mainRoutes);
+  app.use(createResidentRouter({ residentRepository: residents }));
 
   app.use(notFound);
 
