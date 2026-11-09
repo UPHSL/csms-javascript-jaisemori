@@ -1,4 +1,10 @@
-import { validators } from '../utils/validators.js';
+const legacyErrorMessages = Object.freeze({
+  'First name is required.': 'firstName is required',
+  'Last name is required.': 'lastName is required',
+  'Address is required.': 'address is required',
+  'Email is required.': 'email is required',
+  'Invalid email format.': 'email is invalid'
+});
 
 export class ResidentRegistrationService {
   constructor(repository) {
@@ -6,9 +12,12 @@ export class ResidentRegistrationService {
   }
 
   register(resident) {
-    const errors = validators.validateResident(resident);
-    if (errors.length > 0) {
-      return { success: false, errors };
+    const validation = resident.validate();
+    if (!validation.isValid) {
+      return {
+        success: false,
+        errors: validation.errors.map(error => legacyErrorMessages[error] ?? error)
+      };
     }
     const saved = this.repository.save(resident);
     return { success: true, resident: saved };

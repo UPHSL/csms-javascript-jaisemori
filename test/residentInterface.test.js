@@ -98,4 +98,130 @@ describe('T12 - Resident Management Interface', () => {
     assert.match(noMatch.text, /No Residents found\./);
   });
 
+  it('Test 5: registration form renders all required fields without ID or status inputs', async t => {
+    const { app } = createHarness(t, 'registration_form');
+
+    const response = await request(app).get('/residents/register');
+
+    assert.equal(response.statusCode, 200);
+    for (const label of ['First Name', 'Last Name', 'Address', 'Contact Number', 'Email']) {
+      assert.match(response.text, new RegExp(label));
+    }
+    for (const name of ['firstName', 'lastName', 'address', 'contactNumber', 'email']) {
+      assert.match(response.text, new RegExp(`name="${name}"`));
+    }
+    assert.doesNotMatch(response.text, /name="id"/);
+    assert.doesNotMatch(response.text, /name="status"/);
+  });
+
+  it('Test 6: valid registration persists an auto-ID Active Resident and redirects to listing', async t => {
+    const { app, repository } = createHarness(t, 'valid_registration');
+
+    const response = await request(app).post('/residents').type('form').send({
+      id: '999',
+      firstName: 'Lina',
+      lastName: 'Cruz',
+      address: '8 Rizal Avenue',
+      contactNumber: '09112223333',
+      email: 'lina@example.com',
+      status: 'Inactive'
+    });
+
+    assert.equal(response.statusCode, 303);
+    assert.match(response.headers.location, /^\/residents\?message=/);
+    const residents = repository.findAll();
+    assert.equal(residents.length, 1);
+    assert.equal(residents[0].id, '1');
+    assert.equal(residents[0].status, 'Active');
+    const listing = await request(app).get(response.headers.location);
+    assert.match(listing.text, /Resident registered successfully\./);
+    assert.match(listing.text, /Lina/);
+  });
+
+  it('Test 7: invalid registration shows authoritative feedback, preserves values, and writes nothing', async t => {
+    const { app, repository } = createHarness(t, 'invalid_registration');
+
+    const response = await request(app).post('/residents').type('form').send({
+      firstName: 'Lina',
+      lastName: 'Cruz',
+      address: '8 Rizal Avenue',
+      contactNumber: 'invalid',
+      email: 'lina@example.com'
+    });
+
+    assert.equal(response.statusCode, 400);
+    assert.match(response.text, /Invalid contact number format\./);
+    assert.match(response.text, /value="Lina"/);
+    assert.deepEqual(repository.findAll(), []);
+  });
+
+  it('Test 8: edit form shows persisted editable values and read-only ID/status', async t => {
+    const { app, repository } = createHarness(t, 'edit_form');
+    const resident = saveResident(repository, { status: 'Inactive' });
+
+    const response = await request(app).get(`/residents/${resident.id}/edit`);
+
+    assert.equal(response.statusCode, 200);
+    for (const value of ['Maria', 'Santos', '12 Mabini Street', '09123456789', 'maria@example.com']) {
+      assert.match(response.text, new RegExp(`value="${value}"`));
+    }
+    assert.match(response.text, new RegExp(`Resident ID[\\s\\S]*${resident.id}`));
+    assert.match(response.text, /Status[\s\S]*Inactive/);
+    assert.doesNotMatch(response.text, /name="id"/);
+    assert.doesNotMatch(response.text, /name="status"/);
+  });
+
+  it('Test 9: valid update persists allowed fields while preserving ID and status', async t => {
+    const { app, repository } = createHarness(t, 'valid_update');
+    const resident = saveResident(repository, { status: 'Inactive' });
+
+    const response = await request(app).post(`/residents/${resident.id}`).type('form').send({
+      id: '999',
+      firstName: 'Marina',
+      lastName: 'Santos',
+      address: '44 Updated Street',
+      contactNumber: '09998887777',
+      email: 'marina@example.com',
+      status: 'Active'
+    });
+
+    assert.equal(response.statusCode, 303);
+    const updated = repository.findById(resident.id);
+    assert.equal(updated.id, resident.id);
+    assert.equal(updated.status, 'Inactive');
+    assert.equal(updated.firstName, 'Marina');
+    assert.equal(updated.address, '44 Updated Street');
+    assert.match(response.headers.location, /Resident%20information%20updated%20successfully\./);
+  });
+
+  it('Test 10: invalid update shows feedback and leaves persisted information unchanged', async t => {
+    const { app, repository } = createHarness(t, 'invalid_update');
+    const resident = saveResident(repository);
+
+    const response = await request(app).post(`/residents/${resident.id}`).type('form').send({
+      firstName: 'Maria',
+      lastName: 'Santos',
+      address: '12 Mabini Street',
+      contactNumber: 'bad',
+      email: 'attempted@example.com'
+    });
+
+    assert.equal(response.statusCode, 400);
+    assert.match(response.text, /Invalid contact number format\./);
+    assert.match(response.text, /value="attempted@example\.com"/);
+    assert.match(response.text, /Status[\s\S]*Active/);
+    assert.deepEqual(repository.findById(resident.id), resident);
+  });
+
+  it('Test 11: nonexistent edit request returns a controlled HTML not-found response', async t => {
+    const { app, repository } = createHarness(t, 'missing_resident');
+
+    const response = await request(app).get('/residents/999/edit');
+
+    assert.equal(response.statusCode, 404);
+    assert.match(response.text, /Resident not found/);
+    assert.doesNotMatch(response.text, /Error:|stack|ENOENT/i);
+    assert.deepEqual(repository.findAll(), []);
+  });
+
 });
