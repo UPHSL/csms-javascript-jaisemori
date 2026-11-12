@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Request <%= serviceRequest.id %> | CSMS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="page-shell page-shell-narrow">
+    <nav class="section-nav" aria-label="Management sections">
+      <a href="/residents">Residents</a>
+      <a href="/service-requests" aria-current="page">Service Requests</a>
+    </nav>
+
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Service Request Management</p>
+        <h1>Service Request Details</h1>
+        <p class="page-intro">Review the complete request and its current workflow state.</p>
+      </div>
+      <a class="button button-secondary" href="/service-requests">Back to Service Requests</a>
+    </header>
+
+    <% if (message) { %>
+      <div class="alert alert-success" role="status"><%= message %></div>
+    <% } %>
+    <% if (errors.length > 0) { %>
+      <div class="alert alert-error" role="alert">
+        <ul><% errors.forEach((error) => { %><li><%= error %></li><% }); %></ul>
+      </div>
+    <% } %>
+
+    <section class="panel" aria-labelledby="request-details-heading">
+      <div class="section-heading">
+        <h2 id="request-details-heading">Request #<%= serviceRequest.id %></h2>
+        <span class="status-badge status-<%= serviceRequest.status.toLowerCase().replaceAll(' ', '-') %>"><%= serviceRequest.status %></span>
+      </div>
+
+      <dl class="request-details">
+        <div><dt>Service Request ID</dt><dd><%= serviceRequest.id %></dd></div>
+        <div><dt>Resident ID</dt><dd><%= serviceRequest.residentId %></dd></div>
+        <div><dt>Service Type</dt><dd><%= serviceRequest.serviceType %></dd></div>
+        <div><dt>Date Requested</dt><dd><%= serviceRequest.dateRequested %></dd></div>
+        <div class="detail-span"><dt>Description</dt><dd><%= serviceRequest.description %></dd></div>
+        <div><dt>Current Status</dt><dd><%= serviceRequest.status %></dd></div>
+      </dl>
+
+      <div class="workflow-actions" aria-label="Available workflow actions">
+        <% if (serviceRequest.status === 'Pending') { %>
+          <form method="post" action="/service-requests/<%= serviceRequest.id %>/status">
+            <input type="hidden" name="status" value="In Progress">
+            <button class="button button-primary" type="submit">Start Processing</button>
+          </form>
+          <form method="post" action="/service-requests/<%= serviceRequest.id %>/status">
+            <input type="hidden" name="status" value="Cancelled">
+            <button class="button button-danger" type="submit">Cancel</button>
+          </form>
+        <% } else if (serviceRequest.status === 'In Progress') { %>
+          <form method="post" action="/service-requests/<%= serviceRequest.id %>/status">
+            <input type="hidden" name="status" value="Completed">
+            <button class="button button-primary" type="submit">Complete</button>
+          </form>
+          <form method="post" action="/service-requests/<%= serviceRequest.id %>/status">
+            <input type="hidden" name="status" value="Cancelled">
+            <button class="button button-danger" type="submit">Cancel</button>
+          </form>
+        <% } else { %>
+          <p class="muted">This Service Request is terminal and has no available workflow actions.</p>
+        <% } %>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
