@@ -10,7 +10,9 @@ export class ServiceRequestRepository {
   }
 
   _openDatabase(options = {}) {
-    return new DatabaseSync(this.databasePath, options);
+    const database = new DatabaseSync(this.databasePath, options);
+    database.exec('PRAGMA busy_timeout = 5000');
+    return database;
   }
 
   _initializeDatabase() {

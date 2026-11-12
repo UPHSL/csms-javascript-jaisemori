@@ -5,8 +5,10 @@ import express from "express";
 
 import { notFound } from "./middleware/notFound.js";
 import { ResidentRepository } from "./repositories/ResidentRepository.js";
+import { ServiceRequestRepository } from "./repositories/ServiceRequestRepository.js";
 import mainRoutes from "./routes/index.js";
 import { createResidentRouter } from "./routes/residentRoutes.js";
+import { createServiceRequestRouter } from "./routes/serviceRequestRoutes.js";
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFile);
@@ -16,9 +18,10 @@ const currentDirectory = path.dirname(currentFile);
  *
  * @returns {import("express").Express} Configured Express application.
  */
-export function createApp({ residentRepository } = {}) {
+export function createApp({ residentRepository, serviceRequestRepository } = {}) {
   const app = express();
   const residents = residentRepository ?? new ResidentRepository();
+  const serviceRequests = serviceRequestRepository ?? new ServiceRequestRepository();
 
   app.disable("x-powered-by");
 
@@ -31,6 +34,10 @@ export function createApp({ residentRepository } = {}) {
 
   app.use(mainRoutes);
   app.use(createResidentRouter({ residentRepository: residents }));
+  app.use(createServiceRequestRouter({
+    residentRepository: residents,
+    serviceRequestRepository: serviceRequests
+  }));
 
   app.use(notFound);
 
