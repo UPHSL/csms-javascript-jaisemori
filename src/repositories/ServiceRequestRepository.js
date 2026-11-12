@@ -138,6 +138,48 @@ export class ServiceRequestRepository {
     }
   }
 
+  getDashboardCounts() {
+    const database = this._openDatabase({ readOnly: true });
+    try {
+      const counts = database.prepare(`
+        SELECT
+          COUNT(*) AS total,
+          SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) AS pending,
+          SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) AS in_progress,
+          SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) AS completed,
+          SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) AS cancelled
+        FROM service_requests
+      `).get();
+      return {
+        total: Number(counts.total),
+        pending: Number(counts.pending),
+        inProgress: Number(counts.in_progress),
+        completed: Number(counts.completed),
+        cancelled: Number(counts.cancelled)
+      };
+    } finally {
+      database.close();
+    }
+  }
+
+  findRecent(limit = 5) {
+    const parsedLimit = Number(limit);
+    const safeLimit = Number.isInteger(parsedLimit) && parsedLimit > 0
+      ? Math.min(parsedLimit, 5)
+      : 5;
+    const database = this._openDatabase({ readOnly: true });
+    try {
+      return database.prepare(`
+        SELECT id, resident_id, service_type, description, date_requested, status
+        FROM service_requests
+        ORDER BY date_requested DESC, id DESC
+        LIMIT ?
+      `).all(safeLimit).map(record => this._toServiceRequest(record));
+    } finally {
+      database.close();
+    }
+  }
+
   updateStatus(id, status) {
     const database = this._openDatabase();
     try {

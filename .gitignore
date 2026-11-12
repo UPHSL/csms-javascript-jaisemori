@@ -29,6 +29,7 @@ temp/
 *.pid.lock
 data/*.sqlite
 data/*.sqlite-*
+.superpowers/
 
 # IDE settings
 .vscode/

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSMS Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="page-shell">
+    <nav class="section-nav" aria-label="Management sections">
+      <a href="/dashboard" aria-current="page">Dashboard</a>
+      <a href="/residents">Residents</a>
+      <a href="/service-requests">Service Requests</a>
+    </nav>
+
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Community Services Management System</p>
+        <h1>CSMS Dashboard</h1>
+        <p class="page-intro">A read-only summary of current Residents and Service Requests.</p>
+      </div>
+    </header>
+
+    <section class="dashboard-section" aria-labelledby="resident-summary-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Resident Summary</p>
+          <h2 id="resident-summary-heading">Residents</h2>
+        </div>
+        <a class="button button-secondary" href="/residents">Manage Residents</a>
+      </div>
+      <div class="metric-grid metric-grid-three">
+        <article class="metric-card metric-card-primary">
+          <span>Total Residents</span>
+          <strong data-metric="resident-total"><%= residents.total %></strong>
+        </article>
+        <article class="metric-card">
+          <span>Active Residents</span>
+          <strong data-metric="resident-active"><%= residents.active %></strong>
+        </article>
+        <article class="metric-card">
+          <span>Inactive Residents</span>
+          <strong data-metric="resident-inactive"><%= residents.inactive %></strong>
+        </article>
+      </div>
+    </section>
+
+    <section class="dashboard-section" aria-labelledby="request-summary-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Service Request Summary</p>
+          <h2 id="request-summary-heading">Service Requests</h2>
+        </div>
+        <a class="button button-secondary" href="/service-requests">Manage Service Requests</a>
+      </div>
+      <div class="metric-grid">
+        <article class="metric-card metric-card-primary">
+          <span>Total Requests</span>
+          <strong data-metric="request-total"><%= serviceRequests.total %></strong>
+        </article>
+        <article class="metric-card metric-card-open">
+          <span>Open Requests</span>
+          <strong data-metric="request-open"><%= openServiceRequests %></strong>
+          <small>Pending + In Progress</small>
+        </article>
+        <article class="metric-card">
+          <span>Pending</span>
+          <strong data-metric="request-pending"><%= serviceRequests.pending %></strong>
+        </article>
+        <article class="metric-card">
+          <span>In Progress</span>
+          <strong data-metric="request-in-progress"><%= serviceRequests.inProgress %></strong>
+        </article>
+        <article class="metric-card">
+          <span>Completed</span>
+          <strong data-metric="request-completed"><%= serviceRequests.completed %></strong>
+        </article>
+        <article class="metric-card">
+          <span>Cancelled</span>
+          <strong data-metric="request-cancelled"><%= serviceRequests.cancelled %></strong>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="recent-requests-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Latest Activity</p>
+          <h2 id="recent-requests-heading">Recent Service Requests</h2>
+        </div>
+        <span class="record-count">Up to 5 most recent</span>
+      </div>
+
+      <% if (recentServiceRequests.length === 0) { %>
+        <p class="empty-state">No Service Requests have been submitted yet.</p>
+      <% } else { %>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Request ID</th>
+                <th scope="col">Resident ID</th>
+                <th scope="col">Service Type</th>
+                <th scope="col">Date Requested</th>
+                <th scope="col">Status</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recentServiceRequests.forEach((serviceRequest) => { %>
+                <tr>
+                  <td><%= serviceRequest.id %></td>
+                  <td><%= serviceRequest.residentId %></td>
+                  <td><%= serviceRequest.serviceType %></td>
+                  <td><%= serviceRequest.dateRequested %></td>
+                  <td><span class="status-badge status-<%= serviceRequest.status.toLowerCase().replaceAll(' ', '-') %>"><%= serviceRequest.status %></span></td>
+                  <td><a class="button button-small button-secondary" href="/service-requests/<%= serviceRequest.id %>">View</a></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>
