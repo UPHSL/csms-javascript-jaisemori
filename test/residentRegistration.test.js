@@ -109,4 +109,18 @@ describe('T04 - Resident Registration Tests', () => {
     cleanup(filePath);
   });
 
+  it('rejects a contact number that violates the authoritative T02 format', () => {
+    const filePath = getTestFilePath('contact_format');
+    cleanup(filePath);
+    const repository = new ResidentRepository(filePath);
+    const service = new ResidentRegistrationService(repository);
+
+    const result = service.register(new Resident({ ...validData, contactNumber: '12345' }));
+
+    assert.equal(result.success, false);
+    assert.ok(result.errors.some(error => error.includes('contact number')));
+    assert.deepEqual(repository.findAll(), []);
+    cleanup(filePath);
+  });
+
 });
