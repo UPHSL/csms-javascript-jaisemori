@@ -63,6 +63,30 @@ describe('T14 - CSMS Dashboard', () => {
     assert.match(response.text, /href="\/service-requests"/);
   });
 
+  it('renders the professional civic dashboard shell without changing its read-only context', async t => {
+    const { app } = createHarness(t, 'professional_shell');
+    const response = await request(app).get('/dashboard');
+
+    assert.equal(response.statusCode, 200);
+    assert.match(response.text, /class="app-header"/);
+    assert.match(response.text, /class="dashboard-hero"/);
+    assert.match(response.text, /class="dashboard-content"/);
+    assert.match(response.text, /Read-only overview/);
+    assert.match(response.text, /aria-label="Primary navigation"/);
+    assert.match(response.text, /href="\/service-requests\/submit"/);
+  });
+
+  it('serves scoped dashboard styles with accessible small text and focus colors', async t => {
+    const { app } = createHarness(t, 'professional_styles');
+    const response = await request(app).get('/css/style.css');
+
+    assert.equal(response.statusCode, 200);
+    assert.match(response.text, /\.dashboard-page \.metric-icon-blue/);
+    assert.match(response.text, /\.dashboard-page \.dashboard-action/);
+    assert.match(response.text, /\.dashboard-page \.section-description[^}]*#52637a/s);
+    assert.match(response.text, /outline:\s*3px solid #1d4ed8/);
+  });
+
   it('Test 2: empty dashboard displays every zero count and a safe empty state', async t => {
     const { app } = createHarness(t, 'empty');
     const response = await request(app).get('/dashboard');
