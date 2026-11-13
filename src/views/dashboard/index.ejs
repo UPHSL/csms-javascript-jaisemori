@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1f3a">
+  <title>CSMS Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-page">
+  <header class="app-header">
+    <div class="app-header-inner">
+      <a class="brand" href="/dashboard" aria-label="CSMS Dashboard home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-8Z"/><path d="M8 20v-6h8v6M9 10h6"/></svg>
+        </span>
+        <span><strong>CSMS</strong><small>Community Services</small></span>
+      </a>
+      <nav class="app-nav" aria-label="Primary navigation">
+        <a href="/dashboard" aria-current="page">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+          Dashboard
+        </a>
+        <a href="/residents">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.5-4 2.2-6 5.5-6s5 2 5.5 6M15 5.5a3 3 0 0 1 0 5.8M16 13c2.7.4 4.1 2.3 4.5 6"/></svg>
+          Residents
+        </a>
+        <a href="/service-requests">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 4h10a2 2 0 0 1 2 2v14H5V6a2 2 0 0 1 2-2Z"/><path d="M9 4V2h6v2M8.5 9h7M8.5 13h7M8.5 17h4"/></svg>
+          Service Requests
+        </a>
+      </nav>
+      <span class="system-status"><i aria-hidden="true"></i> System online</span>
+    </div>
+  </header>
+
+  <main class="dashboard-content">
+    <section class="dashboard-hero">
+      <div>
+        <p class="dashboard-kicker">Operations overview</p>
+        <h1>CSMS Dashboard</h1>
+        <p>Monitor residents and service delivery activity from one central workspace.</p>
+      </div>
+      <div class="overview-badge">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.6 2.8 8 7 10 4.2-2 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+        <span><strong>Read-only overview</strong><small>Live data from CSMS records</small></span>
+      </div>
+    </section>
+
+    <section class="dashboard-section dashboard-panel" aria-labelledby="resident-summary-heading">
+      <div class="section-heading dashboard-section-heading">
+        <div>
+          <p class="eyebrow">Community registry</p>
+          <h2 id="resident-summary-heading">Resident Summary</h2>
+          <p class="section-description">Current registration and account status.</p>
+        </div>
+        <a class="button button-secondary dashboard-action" href="/residents">Manage Residents <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="metric-grid metric-grid-three">
+        <article class="metric-card metric-card-primary">
+          <div class="metric-card-top"><span class="metric-icon metric-icon-blue" aria-hidden="true">R</span><span class="metric-trend">All records</span></div>
+          <span class="metric-label">Total Residents</span>
+          <strong data-metric="resident-total"><%= residents.total %></strong>
+          <small>Registered in the community</small>
+        </article>
+        <article class="metric-card metric-card-success">
+          <div class="metric-card-top"><span class="metric-icon metric-icon-green" aria-hidden="true">A</span><span class="metric-trend metric-trend-success">Active</span></div>
+          <span class="metric-label">Active Residents</span>
+          <strong data-metric="resident-active"><%= residents.active %></strong>
+          <small>Currently eligible for services</small>
+        </article>
+        <article class="metric-card metric-card-neutral">
+          <div class="metric-card-top"><span class="metric-icon metric-icon-slate" aria-hidden="true">I</span><span class="metric-trend metric-trend-neutral">Inactive</span></div>
+          <span class="metric-label">Inactive Residents</span>
+          <strong data-metric="resident-inactive"><%= residents.inactive %></strong>
+          <small>Archived or deactivated records</small>
+        </article>
+      </div>
+    </section>
+
+    <section class="dashboard-section dashboard-panel" aria-labelledby="request-summary-heading">
+      <div class="section-heading dashboard-section-heading">
+        <div>
+          <p class="eyebrow">Service delivery</p>
+          <h2 id="request-summary-heading">Service Request Summary</h2>
+          <p class="section-description">Workload distribution across the current request lifecycle.</p>
+        </div>
+        <a class="button button-secondary dashboard-action" href="/service-requests">Manage Requests <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="metric-grid request-metric-grid">
+        <article class="metric-card metric-card-featured metric-card-primary">
+          <div class="metric-card-top"><span class="metric-icon metric-icon-blue" aria-hidden="true">Σ</span><span class="metric-trend">All requests</span></div>
+          <span class="metric-label">Total Requests</span>
+          <strong data-metric="request-total"><%= serviceRequests.total %></strong>
+          <small>Across every service category</small>
+        </article>
+        <article class="metric-card metric-card-featured metric-card-open">
+          <div class="metric-card-top"><span class="metric-icon metric-icon-amber" aria-hidden="true">O</span><span class="metric-trend metric-trend-warning">Needs attention</span></div>
+          <span class="metric-label">Open Requests</span>
+          <strong data-metric="request-open"><%= openServiceRequests %></strong>
+          <small>Pending + In Progress</small>
+        </article>
+        <article class="metric-card metric-card-compact metric-card-pending">
+          <span class="metric-status-dot" aria-hidden="true"></span><span class="metric-label">Pending</span>
+          <strong data-metric="request-pending"><%= serviceRequests.pending %></strong>
+        </article>
+        <article class="metric-card metric-card-compact metric-card-progress">
+          <span class="metric-status-dot" aria-hidden="true"></span><span class="metric-label">In Progress</span>
+          <strong data-metric="request-in-progress"><%= serviceRequests.inProgress %></strong>
+        </article>
+        <article class="metric-card metric-card-compact metric-card-completed">
+          <span class="metric-status-dot" aria-hidden="true"></span><span class="metric-label">Completed</span>
+          <strong data-metric="request-completed"><%= serviceRequests.completed %></strong>
+        </article>
+        <article class="metric-card metric-card-compact metric-card-cancelled">
+          <span class="metric-status-dot" aria-hidden="true"></span><span class="metric-label">Cancelled</span>
+          <strong data-metric="request-cancelled"><%= serviceRequests.cancelled %></strong>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel activity-panel" aria-labelledby="recent-requests-heading">
+      <div class="section-heading dashboard-section-heading activity-heading">
+        <div>
+          <p class="eyebrow">Latest activity</p>
+          <h2 id="recent-requests-heading">Recent Service Requests</h2>
+          <p class="section-description">The five most recently submitted community requests.</p>
+        </div>
+        <span class="record-count"><span aria-hidden="true"></span> Up to 5 most recent</span>
+      </div>
+
+      <% if (recentServiceRequests.length === 0) { %>
+        <div class="empty-state dashboard-empty-state">
+          <span class="empty-state-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 4h10a2 2 0 0 1 2 2v14H5V6a2 2 0 0 1 2-2Z"/><path d="M9 4V2h6v2M8.5 10h7M8.5 14h5"/></svg>
+          </span>
+          <strong>No recent service requests</strong>
+          <p>No Service Requests have been submitted yet.</p>
+          <a class="button button-primary" href="/service-requests/submit">Create a Service Request</a>
+        </div>
+      <% } else { %>
+        <div class="table-wrap dashboard-table-wrap">
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th scope="col">Request ID</th>
+                <th scope="col">Resident ID</th>
+                <th scope="col">Service Type</th>
+                <th scope="col">Date Requested</th>
+                <th scope="col">Status</th>
+                <th scope="col"><span class="visually-hidden">Action</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recentServiceRequests.forEach((serviceRequest) => { %>
+                <tr>
+                  <td><span class="request-id">#<%= serviceRequest.id %></span></td>
+                  <td><span class="resident-id"><%= serviceRequest.residentId %></span></td>
+                  <td><strong class="service-type"><%= serviceRequest.serviceType %></strong></td>
+                  <td><%= serviceRequest.dateRequested %></td>
+                  <td><span class="status-badge status-<%= serviceRequest.status.toLowerCase().replaceAll(' ', '-') %>"><span aria-hidden="true"></span><%= serviceRequest.status %></span></td>
+                  <td><a class="table-action" href="/service-requests/<%= serviceRequest.id %>" aria-label="View service request <%= serviceRequest.id %>">View details <span aria-hidden="true">→</span></a></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+
+    <footer class="dashboard-footer">
+      <span>Community Services Management System</span>
+      <span>Secure administrative overview</span>
+    </footer>
+  </main>
+</body>
+</html>

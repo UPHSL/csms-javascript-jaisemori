@@ -7,6 +7,7 @@ import { notFound } from "./middleware/notFound.js";
 import { ResidentRepository } from "./repositories/ResidentRepository.js";
 import { ServiceRequestRepository } from "./repositories/ServiceRequestRepository.js";
 import mainRoutes from "./routes/index.js";
+import { createDashboardRouter } from "./routes/dashboardRoutes.js";
 import { createResidentRouter } from "./routes/residentRoutes.js";
 import { createServiceRequestRouter } from "./routes/serviceRequestRoutes.js";
 
@@ -33,6 +34,10 @@ export function createApp({ residentRepository, serviceRequestRepository } = {})
   app.use(express.static(path.join(currentDirectory, "..", "public")));
 
   app.use(mainRoutes);
+  app.use(createDashboardRouter({
+    residentRepository: residents,
+    serviceRequestRepository: serviceRequests
+  }));
   app.use(createResidentRouter({ residentRepository: residents }));
   app.use(createServiceRequestRouter({
     residentRepository: residents,

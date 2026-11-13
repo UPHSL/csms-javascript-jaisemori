@@ -90,10 +90,10 @@ describe('T04 - Resident Registration Tests', () => {
   it('Test 7: should not write invalid Resident to the database file', () => {
     const filePath = getTestFilePath('t7');
     cleanup(filePath);
-    const service = new ResidentRegistrationService(new ResidentRepository(filePath));
+    const repository = new ResidentRepository(filePath);
+    const service = new ResidentRegistrationService(repository);
     service.register(new Resident({ ...validData, firstName: '   ' }));
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    assert.equal(data.length, 0);
+    assert.equal(repository.findAll().length, 0);
     cleanup(filePath);
   });
 
