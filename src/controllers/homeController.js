@@ -8,8 +8,6 @@ import { applicationConfig } from "../config/application.js";
  */
 export function showHome(request, response) {
   response.status(200).render("index", {
-    applicationName: applicationConfig.name,
-    applicationVersion: applicationConfig.version,
     currentSprint: applicationConfig.currentSprint,
     technology: applicationConfig.technology
   });

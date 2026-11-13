@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= mode === 'register' ? 'Register Resident' : 'Edit Resident' %> | CSMS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="management-page">
+  <%- include('../partials/app-header', { activePage: 'residents' }) %>
+  <main class="page-shell page-shell-narrow">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Resident Management</p>
+        <h1><%= mode === 'register' ? 'Register Resident' : 'Edit Resident' %></h1>
+        <p class="page-intro">Fields marked required must be completed before saving.</p>
+      </div>
+      <a class="button button-secondary" href="/residents">Back to Residents</a>
+    </header>
+
+    <% if (errors.length > 0) { %>
+      <div class="alert alert-error" role="alert">
+        <strong>Please correct the following:</strong>
+        <ul>
+          <% errors.forEach((error) => { %><li><%= error %></li><% }); %>
+        </ul>
+      </div>
+    <% } %>
+
+    <section class="panel">
+      <% if (mode === 'edit') { %>
+        <dl class="read-only-details">
+          <div><dt>Resident ID</dt><dd><%= resident.id %></dd></div>
+          <div><dt>Status</dt><dd><%= resident.status %></dd></div>
+        </dl>
+      <% } %>
+
+      <form class="resident-form" method="post" action="<%= mode === 'register' ? '/residents' : `/residents/${resident.id}` %>">
+        <div class="form-grid">
+          <label>First Name
+            <input name="firstName" type="text" value="<%= resident.firstName ?? '' %>" required>
+          </label>
+          <label>Last Name
+            <input name="lastName" type="text" value="<%= resident.lastName ?? '' %>" required>
+          </label>
+          <label class="form-span">Address
+            <input name="address" type="text" value="<%= resident.address ?? '' %>" required>
+          </label>
+          <label>Contact Number
+            <input name="contactNumber" type="tel" value="<%= resident.contactNumber ?? '' %>" placeholder="09XXXXXXXXX" required>
+          </label>
+          <label>Email
+            <input name="email" type="email" value="<%= resident.email ?? '' %>" required>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="button button-primary" type="submit"><%= mode === 'register' ? 'Register Resident' : 'Save Changes' %></button>
+          <a class="button button-secondary" href="/residents">Cancel</a>
+        </div>
+      </form>
+    </section>
+    <footer class="release-footer">Community Services Management System · CSMS v<%= application.version %></footer>
+  </main>
+</body>
+</html>

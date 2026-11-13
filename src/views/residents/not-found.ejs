@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resident not found | CSMS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="management-page">
+  <%- include('../partials/app-header', { activePage: 'residents' }) %>
+  <main class="page-shell page-shell-narrow">
+    <section class="panel empty-state">
+      <h1>Resident not found</h1>
+      <p>The requested Resident record does not exist.</p>
+      <a class="button button-primary" href="/residents">Return to Resident Management</a>
+    </section>
+    <footer class="release-footer">Community Services Management System · CSMS v<%= application.version %></footer>
+  </main>
+</body>
+</html>

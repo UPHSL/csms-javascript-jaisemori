@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resident Management | CSMS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="management-page">
+  <%- include('../partials/app-header', { activePage: 'residents' }) %>
+  <main class="page-shell">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Community Services Management System</p>
+        <h1>Resident Management</h1>
+        <p class="page-intro">Register, find, update, and manage Resident records.</p>
+      </div>
+      <a class="button button-primary" href="/residents/register">Register Resident</a>
+    </header>
+
+    <% if (message) { %>
+      <div class="alert alert-success" role="status"><%= message %></div>
+    <% } %>
+
+    <section class="panel" aria-labelledby="search-heading">
+      <h2 id="search-heading">Search Residents</h2>
+      <form class="search-form" method="get" action="/residents">
+        <label for="search">First or last name</label>
+        <div class="search-controls">
+          <input id="search" name="search" type="search" value="<%= searchTerm %>" placeholder="Search by name">
+          <button class="button button-primary" type="submit">Search</button>
+          <a class="button button-secondary" href="/residents">Clear</a>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel" aria-labelledby="resident-list-heading">
+      <div class="section-heading">
+        <h2 id="resident-list-heading">Residents</h2>
+        <span class="record-count"><%= residents.length %> record<%= residents.length === 1 ? '' : 's' %></span>
+      </div>
+
+      <% if (residents.length === 0) { %>
+        <p class="empty-state">No Residents found.</p>
+      <% } else { %>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Address</th>
+                <th scope="col">Contact Number</th>
+                <th scope="col">Email</th>
+                <th scope="col">Status</th>
+                <th scope="col">Available Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% residents.forEach((resident) => { %>
+                <tr>
+                  <td><%= resident.id %></td>
+                  <td><%= resident.firstName %></td>
+                  <td><%= resident.lastName %></td>
+                  <td><%= resident.address %></td>
+                  <td><%= resident.contactNumber %></td>
+                  <td><%= resident.email %></td>
+                  <td><span class="status-badge status-<%= resident.status.toLowerCase() %>"><%= resident.status %></span></td>
+                  <td class="actions">
+                    <a class="button button-small button-secondary" href="/residents/<%= resident.id %>/edit">Edit</a>
+                    <% if (resident.status === 'Active') { %>
+                      <form method="post" action="/residents/<%= resident.id %>/deactivate">
+                        <button class="button button-small button-danger" type="submit">Deactivate</button>
+                      </form>
+                    <% } else { %>
+                      <span class="muted">Already Inactive</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+    <footer class="release-footer">Community Services Management System · CSMS v<%= application.version %></footer>
+  </main>
+</body>
+</html>

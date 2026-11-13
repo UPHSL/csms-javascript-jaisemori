@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Request Management | CSMS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="management-page">
+  <%- include('../partials/app-header', { activePage: 'service-requests' }) %>
+  <main class="page-shell">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Community Services Management System</p>
+        <h1>Service Request Management</h1>
+        <p class="page-intro">Submit, find, review, and process community Service Requests.</p>
+      </div>
+      <a class="button button-primary" href="/service-requests/submit">Submit Service Request</a>
+    </header>
+
+    <% if (message) { %>
+      <div class="alert alert-success" role="status"><%= message %></div>
+    <% } %>
+    <% if (errors.length > 0) { %>
+      <div class="alert alert-error" role="alert">
+        <ul><% errors.forEach((error) => { %><li><%= error %></li><% }); %></ul>
+      </div>
+    <% } %>
+
+    <section class="panel" aria-labelledby="request-search-heading">
+      <h2 id="request-search-heading">Search and Filter</h2>
+      <form class="search-form" method="get" action="/service-requests">
+        <div class="filter-grid">
+          <label for="search">Service type or description
+            <input id="search" name="search" type="search" value="<%= searchTerm %>" placeholder="Search Service Requests">
+          </label>
+          <label for="status">Status
+            <select id="status" name="status">
+              <option value="" <%= statusFilter === '' ? 'selected' : '' %>>All statuses</option>
+              <% statuses.forEach((status) => { %>
+                <option value="<%= status %>" <%= statusFilter === status ? 'selected' : '' %>><%= status %></option>
+              <% }); %>
+            </select>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="button button-primary" type="submit">Search / Filter</button>
+          <a class="button button-secondary" href="/service-requests">Clear</a>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel" aria-labelledby="request-list-heading">
+      <div class="section-heading">
+        <h2 id="request-list-heading">Service Requests</h2>
+        <span class="record-count"><%= serviceRequests.length %> record<%= serviceRequests.length === 1 ? '' : 's' %></span>
+      </div>
+
+      <% if (serviceRequests.length === 0) { %>
+        <p class="empty-state">No Service Requests found.</p>
+      <% } else { %>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Request ID</th>
+                <th scope="col">Resident ID</th>
+                <th scope="col">Service Type</th>
+                <th scope="col">Description</th>
+                <th scope="col">Date Requested</th>
+                <th scope="col">Status</th>
+                <th scope="col">Available Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% serviceRequests.forEach((serviceRequest) => { %>
+                <tr>
+                  <td><%= serviceRequest.id %></td>
+                  <td><%= serviceRequest.residentId %></td>
+                  <td><%= serviceRequest.serviceType %></td>
+                  <td class="description-preview"><%= serviceRequest.description %></td>
+                  <td><%= serviceRequest.dateRequested %></td>
+                  <td><span class="status-badge status-<%= serviceRequest.status.toLowerCase().replaceAll(' ', '-') %>"><%= serviceRequest.status %></span></td>
+                  <td class="actions">
+                    <a class="button button-small button-secondary" href="/service-requests/<%= serviceRequest.id %>">View Details</a>
+                    <% if (serviceRequest.status === 'Pending') { %>
+                      <form method="post" action="/service-requests/<%= serviceRequest.id %>/status">
+                        <input type="hidden" name="status" value="In Progress">
+                        <button class="button button-small button-primary" type="submit">Start Processing</button>
+                      </form>
+                      <form method="post" action="/service-requests/<%= serviceRequest.id %>/status">
+                        <input type="hidden" name="status" value="Cancelled">
+                        <button class="button button-small button-danger" type="submit">Cancel</button>
+                      </form>
+                    <% } else if (serviceRequest.status === 'In Progress') { %>
+                      <form method="post" action="/service-requests/<%= serviceRequest.id %>/status">
+                        <input type="hidden" name="status" value="Completed">
+                        <button class="button button-small button-primary" type="submit">Complete</button>
+                      </form>
+                      <form method="post" action="/service-requests/<%= serviceRequest.id %>/status">
+                        <input type="hidden" name="status" value="Cancelled">
+                        <button class="button button-small button-danger" type="submit">Cancel</button>
+                      </form>
+                    <% } else { %>
+                      <span class="muted">No workflow actions</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+    <footer class="release-footer">Community Services Management System · CSMS v<%= application.version %></footer>
+  </main>
+</body>
+</html>

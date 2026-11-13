@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Service Request | CSMS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="management-page">
+  <%- include('../partials/app-header', { activePage: 'service-requests' }) %>
+  <main class="page-shell page-shell-narrow">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Service Request Management</p>
+        <h1>Submit Service Request</h1>
+        <p class="page-intro">New requests receive a generated ID and begin with Pending status.</p>
+      </div>
+      <a class="button button-secondary" href="/service-requests">Back to Service Requests</a>
+    </header>
+
+    <% if (errors.length > 0) { %>
+      <div class="alert alert-error" role="alert">
+        <strong>Please correct the following:</strong>
+        <ul><% errors.forEach((error) => { %><li><%= error %></li><% }); %></ul>
+      </div>
+    <% } %>
+
+    <section class="panel">
+      <form class="service-request-form" method="post" action="/service-requests">
+        <div class="form-grid">
+          <label>Resident ID
+            <input name="residentId" type="text" inputmode="numeric" value="<%= serviceRequest.residentId ?? '' %>" required>
+          </label>
+          <label>Service Type
+            <input name="serviceType" type="text" value="<%= serviceRequest.serviceType ?? '' %>" required>
+          </label>
+          <label class="form-span">Description
+            <textarea name="description" rows="5" required><%= serviceRequest.description ?? '' %></textarea>
+          </label>
+          <label>Date Requested
+            <input name="dateRequested" type="date" value="<%= serviceRequest.dateRequested ?? '' %>" required>
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="button button-primary" type="submit">Submit Service Request</button>
+          <a class="button button-secondary" href="/service-requests">Cancel</a>
+        </div>
+      </form>
+    </section>
+    <footer class="release-footer">Community Services Management System · CSMS v<%= application.version %></footer>
+  </main>
+</body>
+</html>

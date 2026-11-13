@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Request Not Found | CSMS</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="management-page">
+  <%- include('../partials/app-header', { activePage: 'service-requests' }) %>
+  <main class="page-shell page-shell-narrow">
+    <section class="panel empty-state">
+      <p class="eyebrow">Service Request Management</p>
+      <h1>Service Request not found.</h1>
+      <p class="page-intro">The requested record does not exist or the supplied ID is invalid.</p>
+      <a class="button button-primary" href="/service-requests">Back to Service Requests</a>
+    </section>
+    <footer class="release-footer">Community Services Management System · CSMS v<%= application.version %></footer>
+  </main>
+</body>
+</html>
