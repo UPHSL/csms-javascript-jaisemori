@@ -3,6 +3,16 @@ import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { ServiceRequest } from '../models/ServiceRequest.js';
 
+const normalizeIdentifier = value => {
+  if (typeof value === 'number') {
+    return Number.isSafeInteger(value) && value > 0 ? value : null;
+  }
+
+  if (typeof value !== 'string' || !/^[1-9]\d*$/.test(value)) return null;
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) ? parsed : null;
+};
+
 export class ServiceRequestRepository {
   constructor(databasePath) {
     this.databasePath = databasePath || path.join(process.cwd(), 'data', 'service_requests.sqlite');
@@ -76,7 +86,8 @@ export class ServiceRequestRepository {
   }
 
   findById(id) {
-    if (id === null || id === undefined) return null;
+    const normalizedId = normalizeIdentifier(id);
+    if (normalizedId === null) return null;
 
     const database = this._openDatabase({ readOnly: true });
     try {
@@ -84,7 +95,7 @@ export class ServiceRequestRepository {
         SELECT id, resident_id, service_type, description, date_requested, status
         FROM service_requests
         WHERE id = ?
-      `).get(Number(id));
+      `).get(normalizedId);
       return this._toServiceRequest(record);
     } finally {
       database.close();
@@ -181,16 +192,19 @@ export class ServiceRequestRepository {
   }
 
   updateStatus(id, status) {
+    const normalizedId = normalizeIdentifier(id);
+    if (normalizedId === null) return null;
+
     const database = this._openDatabase();
     try {
       const result = database.prepare(`
         UPDATE service_requests
         SET status = ?
         WHERE id = ?
-      `).run(status, Number(id));
+      `).run(status, normalizedId);
 
       if (Number(result.changes) === 0) return null;
-      return this.findById(id);
+      return this.findById(normalizedId);
     } finally {
       database.close();
     }
