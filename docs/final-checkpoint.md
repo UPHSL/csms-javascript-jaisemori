@@ -51,11 +51,11 @@ I established the authoritative release version in `package.json`, which is the 
 ## 7. Final Regression Results
 
 - **Test Command:** `npm test` (`node --test`)
-- **Final Regression Run 1:** PASS - 197 passed, 0 failed, 0 skipped; 17 suites; 7917.6085 ms
-- **Final Regression Run 2:** PASS - 197 passed, 0 failed, 0 skipped; 17 suites; 5871.1599 ms
+- **Final Regression Run 1:** PASS - 197 passed, 0 failed, 0 skipped; 17 suites; 6048.6483 ms
+- **Final Regression Run 2:** PASS - 197 passed, 0 failed, 0 skipped; 17 suites; 5926.8448 ms
 - **Total Passing Tests Reported:** 197
 
-Both complete runs were executed consecutively from `feature/t16-final-release` after the final shared-navigation correction. An isolated direct-HTTP acceptance run also passed startup, health, Dashboard, Resident Management, Service Request Management, valid and rejected workflows, read-only persistence checks, navigation, and version consistency.
+Both complete runs were executed consecutively from `feature/t16-final-release` after the final shared-navigation and `/health` identity corrections. An isolated direct-HTTP acceptance run also passed startup, health, Dashboard, Resident Management, Service Request Management, valid and rejected workflows, read-only persistence checks, navigation, and version consistency.
 
 ## 8. Tools and References Used
 

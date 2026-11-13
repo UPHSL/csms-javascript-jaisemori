@@ -9,7 +9,7 @@ import { applicationConfig } from "../config/application.js";
 export function showHealth(request, response) {
   response.status(200).json({
     status: "ok",
-    application: applicationConfig.name,
+    application: applicationConfig.shortName,
     version: applicationConfig.version
   });
 }

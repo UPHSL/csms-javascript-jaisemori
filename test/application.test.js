@@ -64,7 +64,7 @@ test("health endpoint returns the expected payload", async () => {
 
   assert.deepEqual(response.body, {
     status: "ok",
-    application: "Community Services Management System",
+    application: "CSMS",
     version: "1.0.0"
   });
 });
