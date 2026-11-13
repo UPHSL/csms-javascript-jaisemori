@@ -48,6 +48,13 @@ test("shared release styles provide professional home and management shells", as
   assert.match(response.text, /\.management-page \.section-nav/);
   assert.match(response.text, /\.management-page \.panel/);
   assert.match(response.text, /\.release-footer/);
+  assert.match(response.text, /--surface-elevated:/);
+  assert.match(response.text, /\.release-capability-grid article::before/);
+  assert.match(response.text, /\.management-page \.panel::before/);
+  assert.match(response.text, /\.management-page \.page-header > \.button/);
+  assert.match(response.text, /\.management-page \.form-actions/);
+  assert.match(response.text, /\.management-page \.button:active/);
+  assert.match(response.text, /\.dashboard-page \.metric-card-primary[^}]*linear-gradient/s);
 });
 
 test("health endpoint returns the expected payload", async () => {
