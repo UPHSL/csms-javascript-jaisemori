@@ -6,19 +6,15 @@
   <title>Resident not found | CSMS</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="management-page">
+  <%- include('../partials/app-header', { activePage: 'residents' }) %>
   <main class="page-shell page-shell-narrow">
-    <nav class="section-nav" aria-label="Management sections">
-      <a href="/dashboard">Dashboard</a>
-      <a href="/residents" aria-current="page">Residents</a>
-      <a href="/service-requests">Service Requests</a>
-    </nav>
-
     <section class="panel empty-state">
       <h1>Resident not found</h1>
       <p>The requested Resident record does not exist.</p>
       <a class="button button-primary" href="/residents">Return to Resident Management</a>
     </section>
+    <footer class="release-footer">Community Services Management System · CSMS v<%= application.version %></footer>
   </main>
 </body>
 </html>

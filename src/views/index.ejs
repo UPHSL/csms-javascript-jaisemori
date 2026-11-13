@@ -2,54 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title><%= applicationName %></title>
-
-  <link
-    rel="stylesheet"
-    href="/css/style.css"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1f3a">
+  <title><%= application.name %></title>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
+<body class="home-page">
+  <%- include('partials/app-header', { activePage: '' }) %>
 
-<body>
-  <main class="container">
-    <section class="card">
-      <p class="label">
-        Programming Languages Laboratory
-      </p>
-
-      <h1><%= applicationName %></h1>
-
-      <p class="message">
-        Starter application initialized successfully.
-      </p>
-
-      <dl class="details">
-        <div>
-          <dt>Current Sprint</dt>
-          <dd><%= currentSprint %></dd>
+  <main class="release-home">
+    <section class="release-hero">
+      <div class="release-hero-copy">
+        <p class="dashboard-kicker">Community operations platform</p>
+        <h1><%= application.name %></h1>
+        <p class="release-lead">A secure, practical workspace for managing Resident records, community Service Requests, and day-to-day service delivery.</p>
+        <div class="release-actions">
+          <a class="button button-primary" href="/dashboard">Open Operations Dashboard</a>
+          <a class="button button-secondary" href="/residents">Manage Residents</a>
         </div>
-
-        <div>
-          <dt>Technology</dt>
-          <dd><%= technology %></dd>
-        </div>
-
-        <div>
-          <dt>Version</dt>
-          <dd><%= applicationVersion %></dd>
-        </div>
-      </dl>
-
-      <p class="status">
-        Environment status: Ready
-      </p>
+      </div>
+      <aside class="release-status-card" aria-label="Release information">
+        <span class="release-status-icon" aria-hidden="true">✓</span>
+        <p>Production release</p>
+        <strong>CSMS v<%= application.version %></strong>
+        <dl>
+          <div><dt>Environment</dt><dd>Ready</dd></div>
+          <div><dt>Release stage</dt><dd><%= currentSprint %></dd></div>
+          <div><dt>Technology</dt><dd><%= technology %></dd></div>
+        </dl>
+      </aside>
     </section>
+
+    <section class="release-capabilities" aria-labelledby="capabilities-heading">
+      <div class="release-section-heading">
+        <p class="eyebrow">Core capabilities</p>
+        <h2 id="capabilities-heading">One system for community service operations</h2>
+      </div>
+      <div class="release-capability-grid">
+        <article><span aria-hidden="true">01</span><h3>Resident Management</h3><p>Register, search, update, and safely deactivate Resident records.</p><a href="/residents">View Residents →</a></article>
+        <article><span aria-hidden="true">02</span><h3>Service Requests</h3><p>Submit, find, review, and process requests through a controlled workflow.</p><a href="/service-requests">View Requests →</a></article>
+        <article><span aria-hidden="true">03</span><h3>Operations Dashboard</h3><p>Monitor live Resident and service-delivery metrics from one clear overview.</p><a href="/dashboard">View Dashboard →</a></article>
+      </div>
+    </section>
+
+    <footer class="release-footer">Community Services Management System · CSMS v<%= application.version %></footer>
   </main>
 </body>
 </html>

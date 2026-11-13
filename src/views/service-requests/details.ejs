@@ -6,14 +6,9 @@
   <title>Service Request <%= serviceRequest.id %> | CSMS</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="management-page">
+  <%- include('../partials/app-header', { activePage: 'service-requests' }) %>
   <main class="page-shell page-shell-narrow">
-    <nav class="section-nav" aria-label="Management sections">
-      <a href="/dashboard">Dashboard</a>
-      <a href="/residents">Residents</a>
-      <a href="/service-requests" aria-current="page">Service Requests</a>
-    </nav>
-
     <header class="page-header">
       <div>
         <p class="eyebrow">Service Request Management</p>
@@ -71,6 +66,7 @@
         <% } %>
       </div>
     </section>
+    <footer class="release-footer">Community Services Management System · CSMS v<%= application.version %></footer>
   </main>
 </body>
 </html>

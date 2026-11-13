@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import express from "express";
 
+import { applicationConfig } from "./config/application.js";
 import { notFound } from "./middleware/notFound.js";
 import { ResidentRepository } from "./repositories/ResidentRepository.js";
 import { ServiceRequestRepository } from "./repositories/ServiceRequestRepository.js";
@@ -28,6 +29,7 @@ export function createApp({ residentRepository, serviceRequestRepository } = {})
 
   app.set("views", path.join(currentDirectory, "views"));
   app.set("view engine", "ejs");
+  app.locals.application = applicationConfig;
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
