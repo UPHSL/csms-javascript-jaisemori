@@ -36,6 +36,8 @@ describe('T12 - Resident Management Interface', () => {
     assert.match(response.text, /Resident Management/);
     assert.match(response.text, /Register Resident/);
     assert.match(response.text, /Search Residents/);
+    assert.match(response.text, /CSMS v1\.0\.0/);
+    assert.match(response.text, /class="management-page"/);
   });
 
   it('Test 2: lists persisted Residents in T05 order with all required information', async t => {

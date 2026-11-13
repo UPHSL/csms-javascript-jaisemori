@@ -6,7 +6,7 @@
   <title>Service Request <%= serviceRequest.id %> | CSMS</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="management-page">
   <main class="page-shell page-shell-narrow">
     <nav class="section-nav" aria-label="Management sections">
       <a href="/dashboard">Dashboard</a>
@@ -71,6 +71,7 @@
         <% } %>
       </div>
     </section>
+    <footer class="release-footer">Community Services Management System · CSMS v<%= application.version %></footer>
   </main>
 </body>
 </html>

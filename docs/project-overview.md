@@ -3,8 +3,9 @@
 This repository contains the JavaScript and Express.js implementation of the
 Community Services Management System.
 
-Students will extend the application incrementally through canonical CSMS
-tickets issued during the Programming Languages Laboratory.
+The application was developed incrementally through the canonical CSMS
+tickets issued during the Programming Languages Laboratory and is now the
+verified final course release.
 
 ## Technology Stack
 
@@ -12,12 +13,13 @@ tickets issued during the Programming Languages Laboratory.
 - Node.js 24 LTS
 - Express.js
 - EJS
+- SQLite (`node:sqlite`)
 - npm
 - Node test runner
 - Supertest
 
-## Starter Version
+## Release Version
 
 ```text
-Version: 0.1.0
-Sprint: Sprint 0 - Developer Onboarding
+Version: 1.0.0
+Sprint: Sprint 6 - Final Release

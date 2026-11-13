@@ -502,6 +502,13 @@ dd {
   max-width: 820px;
 }
 
+.release-footer {
+  padding: 0.5rem 0 0;
+  color: #64748b;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
 .page-header,
 .section-heading,
 .search-controls,
@@ -946,4 +953,268 @@ th {
 @media (max-width: 700px) {
   .dashboard-page .dashboard-panel { padding: 1.15rem; border-radius: 13px; }
   .dashboard-page .request-metric-grid { grid-template-columns: 1fr; }
+}
+
+/* T16 shared professional release presentation */
+.home-page,
+.management-page {
+  color: #172033;
+  background:
+    radial-gradient(circle at 85% 0%, rgb(37 112 203 / 10%), transparent 30rem),
+    #f4f7fb;
+}
+
+.home-page .brand-mark {
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+
+.release-home {
+  width: min(100% - 2rem, 1240px);
+  margin: 0 auto;
+  padding: 3.5rem 0 1.25rem;
+}
+
+.home-page .release-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.75fr);
+  gap: 2rem;
+  align-items: center;
+  min-height: 430px;
+  padding: clamp(2rem, 5vw, 4rem);
+  overflow: hidden;
+  border: 1px solid #dce5f0;
+  border-radius: 24px;
+  background:
+    linear-gradient(120deg, rgb(255 255 255 / 98%), rgb(244 249 255 / 94%)),
+    #fff;
+  box-shadow: 0 24px 70px rgb(22 45 78 / 10%);
+}
+
+.release-hero-copy h1 {
+  max-width: 760px;
+  margin: 0;
+  color: #10233f;
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  letter-spacing: -0.055em;
+}
+
+.release-lead {
+  max-width: 680px;
+  margin: 1.25rem 0 0;
+  color: #596b82;
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  line-height: 1.75;
+}
+
+.release-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.release-actions .button {
+  min-height: 3rem;
+  padding-inline: 1.15rem;
+  border-radius: 9px;
+}
+
+.release-status-card {
+  padding: 1.65rem;
+  border: 1px solid #d9e4f1;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 14px 35px rgb(26 60 102 / 9%);
+}
+
+.release-status-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  color: #176743;
+  background: #e7f8f0;
+  font-size: 1.15rem;
+  font-weight: 850;
+  place-items: center;
+}
+
+.release-status-card > p {
+  margin: 1.1rem 0 0.15rem;
+  color: #61738b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.release-status-card > strong {
+  color: #173052;
+  font-size: 1.55rem;
+  letter-spacing: -0.025em;
+}
+
+.release-status-card dl {
+  display: grid;
+  gap: 0;
+  margin: 1.35rem 0 0;
+}
+
+.release-status-card dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 0;
+  border-top: 1px solid #edf1f6;
+}
+
+.release-status-card dt { color: #7b899b; font-size: 0.68rem; }
+.release-status-card dd { margin: 0; color: #334963; font-size: 0.78rem; font-weight: 750; text-align: right; }
+
+.release-capabilities { padding: 4rem 0 2rem; }
+.release-section-heading { max-width: 650px; margin-bottom: 1.5rem; }
+.release-section-heading h2 { margin: 0; color: #142b49; font-size: clamp(1.65rem, 3vw, 2.35rem); letter-spacing: -0.035em; }
+.release-capability-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+
+.release-capability-grid article {
+  padding: 1.5rem;
+  border: 1px solid #dfe7f1;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgb(27 52 86 / 5%);
+}
+
+.release-capability-grid article > span { color: #2b70bf; font-size: 0.68rem; font-weight: 850; letter-spacing: 0.1em; }
+.release-capability-grid h3 { margin: 0.7rem 0 0.45rem; color: #1d3553; font-size: 1.05rem; }
+.release-capability-grid p { min-height: 3.9rem; margin: 0; color: #687990; font-size: 0.87rem; line-height: 1.65; }
+.release-capability-grid a { display: inline-block; margin-top: 1rem; color: #2867ad; font-size: 0.8rem; font-weight: 750; text-decoration: none; }
+.release-capability-grid a:hover { text-decoration: underline; }
+
+.management-page .page-shell {
+  width: min(100% - 2rem, 1240px);
+  padding: 1.25rem 0 1rem;
+}
+
+.management-page .page-shell-narrow { max-width: 880px; }
+
+.management-page .section-nav {
+  position: sticky;
+  z-index: 15;
+  top: 0.75rem;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+  padding: 0.45rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 12px;
+  background: #0b1f3a;
+  box-shadow: 0 10px 28px rgb(11 31 58 / 18%);
+}
+
+.management-page .section-nav::before {
+  padding: 0 0.8rem;
+  color: #fff;
+  content: "CSMS";
+  font-size: 0.82rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+}
+
+.management-page .section-nav a {
+  padding: 0.62rem 0.85rem;
+  border-radius: 8px;
+  color: #b9c7da;
+  font-size: 0.8rem;
+  transition: color 140ms ease, background 140ms ease;
+}
+
+.management-page .section-nav a:hover { color: #fff; background: rgb(255 255 255 / 8%); }
+.management-page .section-nav a[aria-current="page"] { color: #fff; background: #236abd; }
+
+.management-page .page-header {
+  margin-bottom: 1.25rem;
+  padding: 1.6rem 1.75rem;
+  border: 1px solid #dce5ef;
+  border-radius: 16px;
+  background: linear-gradient(130deg, #fff, #f7faff);
+  box-shadow: 0 9px 30px rgb(27 52 86 / 6%);
+}
+
+.management-page .page-header h1 {
+  margin: 0;
+  color: #142b49;
+  font-size: clamp(1.8rem, 3vw, 2.45rem);
+  letter-spacing: -0.035em;
+}
+
+.management-page .page-intro { margin: 0.45rem 0 0; color: #687990; }
+
+.management-page .panel {
+  padding: 1.4rem;
+  border-color: #dfe7f1;
+  border-radius: 14px;
+  box-shadow: 0 7px 24px rgb(27 52 86 / 5%);
+}
+
+.management-page .panel h2 { color: #233b5a; font-size: 1.12rem; }
+.management-page .record-count { padding: 0.28rem 0.58rem; border-radius: 999px; background: #eef3f8; font-size: 0.72rem; font-weight: 750; }
+
+.management-page input,
+.management-page select,
+.management-page textarea {
+  border-color: #b9c6d6;
+  border-radius: 8px;
+  background: #fff;
+  color: #22364f;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.management-page input:focus,
+.management-page select:focus,
+.management-page textarea:focus {
+  border-color: #2b70bf;
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(43 112 191 / 15%);
+}
+
+.management-page .button { border-radius: 8px; transition: transform 130ms ease, box-shadow 130ms ease, background 130ms ease; }
+.management-page .button:hover { transform: translateY(-1px); }
+.management-page .button-primary { background: #236abd; box-shadow: 0 5px 13px rgb(35 106 189 / 18%); }
+.management-page .button-primary:hover { background: #19599f; }
+.management-page .button-secondary { border-color: #b9c6d6; color: #2c405a; }
+
+.management-page table { border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; }
+.management-page th { background: #f6f8fb; color: #5d6f86; font-size: 0.68rem; letter-spacing: 0.06em; }
+.management-page td { color: #41546c; font-size: 0.84rem; }
+.management-page tbody tr { transition: background 120ms ease; }
+.management-page tbody tr:hover { background: #f8fbff; }
+.management-page .alert { border-radius: 11px; box-shadow: 0 5px 16px rgb(27 52 86 / 4%); }
+.management-page .empty-state { color: #67788f; }
+.management-page .release-footer { padding: 0.8rem 0 0.35rem; }
+
+.home-page a:focus-visible,
+.management-page a:focus-visible,
+.management-page button:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .home-page .release-hero { grid-template-columns: 1fr; }
+  .release-capability-grid { grid-template-columns: 1fr; }
+  .release-capability-grid p { min-height: 0; }
+}
+
+@media (max-width: 700px) {
+  .release-home { width: min(100% - 1.25rem, 1240px); padding-top: 1.5rem; }
+  .home-page .release-hero { min-height: 0; padding: 1.5rem; border-radius: 17px; }
+  .release-actions { align-items: stretch; flex-direction: column; }
+  .management-page .page-shell { width: min(100% - 1.25rem, 1240px); }
+  .management-page .section-nav { position: static; flex-wrap: wrap; }
+  .management-page .section-nav::before { width: 100%; padding: 0.35rem 0.65rem; }
+  .management-page .section-nav a { flex: 1; justify-content: center; text-align: center; }
+  .management-page .page-header { padding: 1.25rem; }
 }

@@ -56,6 +56,8 @@ describe('T13 - Service Request Management Interface', () => {
     assert.match(response.text, /Submit Service Request/);
     assert.match(response.text, /Search and Filter/);
     assert.match(response.text, /href="\/residents"/);
+    assert.match(response.text, /CSMS v1\.0\.0/);
+    assert.match(response.text, /class="management-page"/);
   });
 
   it('Test 2: lists persisted requests in T11 order with required information and actions', async t => {

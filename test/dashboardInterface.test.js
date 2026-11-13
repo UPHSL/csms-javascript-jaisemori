@@ -61,6 +61,7 @@ describe('T14 - CSMS Dashboard', () => {
     assert.match(response.text, /href="\/dashboard"/);
     assert.match(response.text, /href="\/residents"/);
     assert.match(response.text, /href="\/service-requests"/);
+    assert.match(response.text, /CSMS v1\.0\.0/);
   });
 
   it('renders the professional civic dashboard shell without changing its read-only context', async t => {
